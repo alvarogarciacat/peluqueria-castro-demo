@@ -1,0 +1,157 @@
+/* Peluquería Castro · panel del equipo (pensado sobre todo para el móvil del barbero) */
+.panel { padding-bottom: 80px; }
+.p-wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+.p-head { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); color: var(--fg); }
+.p-head__inner { height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.p-demo { font-size: 13px; color: var(--muted); border: 1px dashed var(--line-strong); border-radius: 8px; padding: 12px 14px; margin: 20px 0; }
+.p-demo strong { color: var(--accent); }
+
+/* Barra: barberos + vista */
+.p-toolbar { display: flex; flex-wrap: wrap; gap: 10px; }
+.p-seg { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; }
+.p-barbers { flex: 1 1 420px; }
+.p-views { flex: 0 1 260px; }
+.p-seg button {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 10px;
+  border: 0; border-radius: 7px; background: none; color: var(--fg); font: 600 14px var(--sans); cursor: pointer; white-space: nowrap;
+}
+.p-seg button:hover { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+.p-seg button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
+.p-ini { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; border: 1px solid currentColor; opacity: .8; flex: none; }
+
+/* Navegación de fechas */
+.p-date { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; margin: 22px 0 14px; }
+.p-date__nav { display: flex; align-items: center; gap: 6px; }
+.p-date__label { font-family: var(--display); font-weight: var(--d-weight); font-stretch: var(--d-stretch); font-size: calc(28px * var(--ds)); line-height: 1.15; text-align: center; }
+.p-icon { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 1px solid var(--line-strong); background: none; color: var(--fg); font-size: 22px; line-height: 1; cursor: pointer; }
+.p-icon:hover, .p-today:hover { border-color: var(--accent); }
+.p-today { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-strong); background: none; color: var(--fg); font: 600 13px var(--sans); cursor: pointer; }
+.p-today.is-on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.p-pick { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-strong); font: 600 13px var(--sans); cursor: pointer; }
+.p-pick span { white-space: nowrap; }
+.p-pick input { border: 0; background: none; color: var(--fg); font: 500 13px var(--sans); color-scheme: inherit; min-width: 0; width: 130px; }
+.p-pick input:focus { outline: none; }
+.p-pick:focus-within { border-color: var(--accent); }
+
+.p-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 20px; }
+.p-stats div { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.p-stats dt { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.p-stats dd { margin: 2px 0 0; font-family: var(--display); font-weight: var(--d-weight); font-size: calc(26px * var(--ds)); line-height: 1.1; color: var(--accent-hi); }
+
+/* ---------- Vista día (lista) ---------- */
+.p-agenda { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 760px; }
+.p-item { display: grid; grid-template-columns: 58px 1fr; gap: 12px; align-items: stretch; }
+.p-time { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; padding-top: 12px; display: flex; flex-direction: column; }
+.p-time small { font-weight: 400; color: var(--muted); font-size: 12px; }
+.p-body { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 8px; padding: 12px 14px; border: 1px solid var(--line); min-height: 52px; }
+.p-tag { font-size: 13px; font-weight: 600; }
+.p-item--free .p-body { border-style: dashed; color: var(--ok); }
+.p-item--sim .p-body { background: var(--surface-2); color: var(--muted); }
+.p-item--break .p-body { border: 0; min-height: 0; padding: 4px 14px; color: var(--muted); }
+.p-item--break .p-time { padding-top: 4px; color: var(--muted); }
+.p-item--block .p-body { color: var(--warn); background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--warn) 10%, transparent) 0 6px, transparent 6px 12px); border-color: color-mix(in srgb, var(--warn) 40%, transparent); }
+.p-item--booking .p-body { align-items: flex-start; border-color: var(--accent-mid); border-left: 3px solid var(--accent); background: var(--accent-soft); }
+.p-item.is-past { opacity: .45; }
+.p-booking p { margin: 0; }
+.p-svc { font-weight: 700; font-size: 15px; }
+.p-svc span { font-weight: 400; color: var(--muted); font-size: 13px; }
+.p-client { font-size: 15px; margin-top: 2px !important; }
+.p-contact { display: flex; gap: 14px; margin-top: 6px !important; font-size: 13px; }
+.p-contact a { color: var(--accent); }
+.p-style { display: flex; align-items: center; gap: 8px; margin-top: 8px !important; font-size: 13px; font-weight: 600; }
+.p-style .cut-svg { width: 26px; }
+.p-notes { margin-top: 6px !important; font-size: 13px; color: var(--fg-soft); font-style: italic; }
+.p-btn { flex: none; min-height: 36px; padding: 0 12px; border-radius: 6px; border: 1px solid currentColor; background: none; color: inherit; font: 600 12px var(--sans); cursor: pointer; }
+.p-btn--danger { color: var(--warn); }
+.p-closed { padding: 40px 0; text-align: center; color: var(--muted); }
+
+/* ---------- Calendario por horas (semana / día con todos) ---------- */
+.cal { --h: 640px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.cal-scroll { overflow-x: auto; }
+.cal-grid { display: grid; grid-template-columns: 52px repeat(var(--cols), minmax(92px, 1fr)); min-width: calc(52px + var(--cols) * 92px); }
+.cal--wide .cal-grid { grid-template-columns: 52px repeat(var(--cols), minmax(120px, 1fr)); min-width: calc(52px + var(--cols) * 120px); }
+.cal-axis-wrap { position: sticky; left: 0; z-index: 3; background: var(--bg); border-right: 1px solid var(--line); }
+.cal-axis { position: relative; height: var(--h); }
+.cal-axis span { position: absolute; right: 8px; transform: translateY(-50%); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cal-col { border-right: 1px solid var(--line); min-width: 0; }
+.cal-col:last-child { border-right: 0; }
+.cal-head {
+  height: 58px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+  border: 0; border-bottom: 1px solid var(--line); background: var(--surface); color: var(--fg); font: inherit; cursor: pointer;
+}
+.cal-head small { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.cal-head strong { font-family: var(--display); font-weight: var(--d-weight); font-size: 20px; line-height: 1.1; }
+.cal-head.is-today strong { color: var(--on-accent); background: var(--accent); border-radius: 999px; padding: 0 8px; }
+.cal-head--empty { cursor: default; }
+.cal-head:not(.cal-head--empty):hover { background: var(--surface-2); }
+.cal-body { position: relative; height: var(--h); }
+.cal-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--line); }
+.cal-closed { position: absolute; left: 0; right: 0; background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--fg) 5%, transparent) 0 4px, transparent 4px 10px); display: grid; place-items: center; }
+.cal-closed span { font-size: 12px; color: var(--muted); }
+.cal-lane { position: absolute; top: 0; bottom: 0; padding: 0 2px; }
+.cal-ev {
+  position: absolute; left: 2px; right: 2px; border-radius: 5px; padding: 3px 5px; overflow: hidden;
+  font-size: 11px; line-height: 1.25; min-height: 6px;
+}
+.cal-ev--booking { background: var(--accent); color: var(--on-accent); cursor: pointer; box-shadow: 0 1px 0 color-mix(in srgb, var(--bg) 60%, transparent); }
+.cal-ev--booking span { opacity: .85; }
+.cal-ev--booking:hover { filter: brightness(1.08); }
+.cal-ev--sim { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+.cal-ev--block { color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent); background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--warn) 14%, transparent) 0 5px, transparent 5px 10px); }
+.cal-now { position: absolute; left: 0; right: 0; height: 2px; background: #ff4d4d; z-index: 2; }
+.cal-now::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: #ff4d4d; }
+
+/* ---------- Mes ---------- */
+.month { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.m-names { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--surface); border-bottom: 1px solid var(--line); }
+.m-names span { padding: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); text-align: center; }
+.m-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.m-day {
+  min-height: 96px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 8px;
+  border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer;
+}
+.m-day:nth-child(7n) { border-right: 0; }
+.m-day:hover { background: var(--surface); }
+.m-day.is-out { opacity: .4; }
+.m-day.is-closed { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--fg) 4%, transparent) 0 4px, transparent 4px 10px); }
+.m-num { font-family: var(--display); font-weight: var(--d-weight); font-size: 20px; line-height: 1; }
+.m-day.is-today .m-num { background: var(--accent); color: var(--on-accent); border-radius: 999px; padding: 3px 8px; }
+.m-bar { width: 100%; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: auto; }
+.m-bar i { display: block; height: 100%; background: var(--ok); }
+.m-bar--mid i { background: var(--accent); }
+.m-bar--high i { background: var(--warn); }
+.m-occ { font-size: 11px; color: var(--muted); }
+.m-web { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 999px; background: var(--accent); color: var(--on-accent); }
+.m-closed { font-size: 11px; color: var(--muted); margin-top: auto; }
+
+/* Leyenda */
+.p-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; font-size: 12px; color: var(--muted); }
+.p-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.lg { width: 14px; height: 10px; border-radius: 3px; display: inline-block; }
+.lg--booking { background: var(--accent); }
+.lg--sim { background: var(--surface-2); border: 1px solid var(--line); }
+.lg--block { border: 1px solid var(--warn); background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--warn) 30%, transparent) 0 3px, transparent 3px 6px); }
+.lg--free { border: 1px dashed var(--ok); }
+
+.p-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+@media (max-width: 700px) {
+  .p-head .btn { padding: 0 14px; font-size: 13px; }
+  .p-barbers, .p-views { flex: 1 1 100%; }
+  .p-barbers button { flex-direction: column; gap: 2px; font-size: 12px; padding: 6px 0; }
+  .p-date { grid-template-columns: 1fr auto; }
+  .p-date__label { grid-column: 1 / -1; grid-row: 1; text-align: left; }
+  .p-pick span { display: none; }
+  .p-stats dd { font-size: calc(22px * var(--ds)); }
+  .cal { --h: 560px; }
+  .m-day { min-height: 64px; padding: 5px; }
+  .m-occ { display: none; }
+  .m-num { font-size: 15px; }
+  .m-web { font-size: 9px; padding: 1px 4px; }
+}
+
+/* En el panel, el botón de ajustes va a la derecha para no tapar las horas */
+.panel .aj-fab { left: auto; right: 16px; }

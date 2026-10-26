@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Panel del equipo · Peluquería Castro</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0f0e0c">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="js/tema.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/panel.css">
+</head>
+<body class="panel">
+  <header class="p-head">
+    <div class="p-wrap p-head__inner">
+      <a href="./" class="logo" aria-label="Ir a la web">
+        <span class="logo__mark" aria-hidden="true">C</span>
+        <span class="logo__text"><span class="logo__name">Castro</span><span class="logo__sub">Panel del equipo</span></span>
+      </a>
+      <a href="./#reservar" class="btn btn--brass btn--sm" target="_blank" rel="noopener">+ Nueva reserva</a>
+    </div>
+  </header>
+
+  <main class="p-wrap">
+    <p class="p-demo">
+      <strong>Demo.</strong> Las reservas que hagas en la web desde este navegador aparecen aquí al momento.
+      Las citas en gris son de ejemplo, para que la agenda no salga vacía.
+    </p>
+
+    <div class="p-toolbar">
+      <div class="p-seg p-barbers" role="tablist" aria-label="Barbero" data-barbers></div>
+      <div class="p-seg p-views" role="tablist" aria-label="Vista" data-views></div>
+    </div>
+
+    <div class="p-date">
+      <div class="p-date__nav">
+        <button class="p-icon" type="button" data-move="-1" aria-label="Anterior">‹</button>
+        <button class="p-today" type="button" data-today>Hoy</button>
+        <button class="p-icon" type="button" data-move="1" aria-label="Siguiente">›</button>
+      </div>
+      <strong class="p-date__label" data-date-label></strong>
+      <label class="p-pick">
+        <span>Ir a fecha</span>
+        <input type="date" data-pick aria-label="Elegir fecha">
+      </label>
+    </div>
+
+    <dl class="p-stats" data-stats></dl>
+
+    <div data-view></div>
+
+    <div class="p-legend" aria-hidden="true">
+      <span><i class="lg lg--booking"></i>Reserva web</span>
+      <span><i class="lg lg--sim"></i>Cita (ejemplo)</span>
+      <span><i class="lg lg--block"></i>Bloqueado</span>
+      <span><i class="lg lg--free"></i>Libre</span>
+    </div>
+
+    <div class="p-actions" data-actions></div>
+  </main>
+
+  <script src="js/datos.js"></script>
+  <script src="js/panel.js"></script>
+</body>
+</html>

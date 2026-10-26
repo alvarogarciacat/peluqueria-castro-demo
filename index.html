@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Peluquería Castro · Peluquería y barbería en Castellón</title>
+  <meta name="description" content="Peluquería y barbería en Castellón para todas las edades. Cortes, fade, barba, cejas con hilo, tintes y mechas. Reserva tu cita online en un minuto.">
+  <!-- Demo: no indexar hasta que sea la web oficial -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0f0e0c">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Peluquería Castro · Castellón">
+  <meta property="og:description" content="Peluquería y barbería para todas las edades. Reserva online.">
+  <meta property="og:image" content="img/og.jpg">
+  <meta property="og:locale" content="es_ES">
+
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script src="js/tema.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HairSalon",
+    "name": "Peluquería Castro",
+    "telephone": "+34 667 00 57 50",
+    "email": "cristianlincastro@gmail.com",
+    "priceRange": "10€ - 55€",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Calle Clara Campoamor, 1",
+      "addressLocality": "Castellón de la Plana",
+      "postalCode": "12003",
+      "addressRegion": "Castellón",
+      "addressCountry": "ES"
+    },
+    "openingHoursSpecification": [
+      {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday"], "opens": "10:30", "closes": "14:00"},
+      {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday"], "opens": "16:00", "closes": "20:00"},
+      {"@type": "OpeningHoursSpecification", "dayOfWeek": "Friday", "opens": "10:30", "closes": "14:00"},
+      {"@type": "OpeningHoursSpecification", "dayOfWeek": "Friday", "opens": "16:00", "closes": "20:30"},
+      {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "10:30", "closes": "15:00"}
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#servicios">Saltar a servicios</a>
+
+  <!-- ============ CABECERA ============ -->
+  <header class="header" data-header>
+    <div class="header__inner">
+      <a href="#inicio" class="logo" aria-label="Peluquería Castro, inicio">
+        <span class="logo__mark" aria-hidden="true">C</span>
+        <span class="logo__text">
+          <span class="logo__name">Castro</span>
+          <span class="logo__sub">Peluquería · Barbería</span>
+        </span>
+      </a>
+
+      <nav class="nav" data-nav aria-label="Principal">
+        <a href="#servicios">Servicios</a>
+        <a href="#cortes">Cortes</a>
+        <a href="#equipo">Equipo</a>
+        <a href="#galeria">Galería</a>
+        <a href="#visitanos">Horario</a>
+        <a href="#reservar" data-book class="btn btn--brass btn--sm">Reservar cita</a>
+      </nav>
+
+      <button class="burger" data-burger aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="inicio">
+      <picture class="hero__bg">
+        <source media="(max-width: 760px)" data-foto="hero-movil">
+        <img data-foto="hero" alt="Peluquero trabajando con un cliente" fetchpriority="high">
+      </picture>
+      <div class="hero__shade"></div>
+
+      <div class="hero__content container">
+        <p class="status" data-status><span class="status__dot"></span><span data-status-text>Consultando horario…</span></p>
+        <p class="eyebrow">Peluquería y barbería · Castellón</p>
+        <h1 class="hero__title">Tu pelo, en <em>buenas manos</em>.</h1>
+        <p class="hero__lead">Cortes, color, barba y cejas para todas las edades. Reserva tu cita aquí mismo en menos de un minuto.</p>
+        <div class="hero__ctas">
+          <a href="#reservar" data-book class="btn btn--brass">Reservar cita <span aria-hidden="true">→</span></a>
+          <a href="#servicios" class="btn btn--ghost btn--photo">Ver servicios y precios</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INTRO ============ -->
+    <section class="intro container">
+      <div class="intro__text reveal">
+        <p class="eyebrow">Quiénes somos</p>
+        <h2 class="h2">Para todas las edades<br>y todos los <em>estilos</em>.</h2>
+        <p>En Peluquería Castro cada corte empieza con una conversación: qué quieres, cómo llevas el pelo y cómo te lo vas a peinar mañana. Después, tijera, máquina y navaja hasta que quede como tiene que quedar.</p>
+        <p>Degradados limpios, barbas definidas, cejas con hilo y trabajos de color, del tinte a las mechas plateadas.</p>
+        <a href="#equipo" class="link">Conoce al equipo <span aria-hidden="true">→</span></a>
+      </div>
+      <figure class="intro__img reveal">
+        <img data-foto="intro" alt="Interior de la peluquería" loading="lazy" width="900" height="1125">
+      </figure>
+    </section>
+
+    <!-- ============ SERVICIOS ============ -->
+    <section class="services" id="servicios">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow eyebrow--menu">Carta de servicios</p>
+          <h2 class="h2">Servicios y precios</h2>
+          <p class="section-head__lead">Precio y duración de cada servicio. Toca cualquiera para reservar.</p>
+        </header>
+        <!-- La carta se genera desde js/datos.js (misma fuente que las reservas) -->
+        <div class="menu" data-menu></div>
+      </div>
+    </section>
+
+    <!-- ============ PACK DESTACADO ============ -->
+    <section class="feature">
+      <div class="feature__img reveal">
+        <img data-foto="feature" alt="Peluquero repasando un corte" loading="lazy" width="800" height="1000">
+      </div>
+      <div class="feature__body reveal">
+        <p class="eyebrow">Todo en uno</p>
+        <h2 class="h2">El completo</h2>
+        <p class="feature__list">Fade <span>·</span> Barba <span>·</span> Cejas <span>·</span> Lavado</p>
+        <p>Una hora en el sillón para salir con todo en su sitio: degradado, barba perfilada a navaja y cejas con hilo.</p>
+        <div class="feature__price"><span>30 €</span><small>1 hora</small></div>
+        <a href="#reservar" data-book data-service="completo" class="btn btn--brass">Reservar El completo <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <!-- ============ GUÍA DE CORTES ============ -->
+    <section class="cuts" id="cortes">
+      <div class="container">
+        <header class="section-head section-head--row reveal">
+          <div>
+            <p class="eyebrow">Guía de cortes</p>
+            <h2 class="h2">¿Qué fade te pega?</h2>
+          </div>
+          <p class="section-head__lead">Lo que cambia es la altura a la que empieza el degradado. Elige uno al reservar y lo veremos antes de que llegues.</p>
+        </header>
+        <div class="cuts__grid" data-cuts></div>
+        <p class="cuts__note reveal">¿Tienes una foto de referencia? Tráela o mándala por WhatsApp. Lo hablamos en el sillón.</p>
+      </div>
+    </section>
+
+    <!-- ============ EQUIPO ============ -->
+    <section class="team container" id="equipo">
+      <header class="section-head reveal">
+        <p class="eyebrow">Equipo</p>
+        <h2 class="h2">Nuestro equipo</h2>
+        <p class="section-head__lead">Al reservar puedes elegir con quién. Si ya tienes a alguien de confianza, no hace falta cambiar.</p>
+      </header>
+      <div class="team__grid">
+        <article class="barber reveal">
+          <div class="barber__photo" aria-hidden="true"><span>CL</span></div>
+          <h3>Cristian Lin Castro</h3>
+          <p>Peluquería y barbería</p>
+          <a href="#reservar" data-book data-barber="cristian" class="link">Reservar con Cristian <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="barber reveal">
+          <div class="barber__photo" aria-hidden="true"><span>SC</span></div>
+          <h3>Samuel Castro</h3>
+          <p>Peluquería y barbería</p>
+          <a href="#reservar" data-book data-barber="samuel" class="link">Reservar con Samuel <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="barber reveal">
+          <div class="barber__photo" aria-hidden="true"><span>CD</span></div>
+          <h3>Castro Dos Santos</h3>
+          <p>Peluquería y barbería</p>
+          <a href="#reservar" data-book data-barber="castro" class="link">Reservar con Castro <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ GALERÍA ============ -->
+    <section class="gallery" id="galeria">
+      <div class="container">
+        <header class="section-head section-head--row reveal">
+          <div>
+            <p class="eyebrow">Galería</p>
+            <h2 class="h2">Del sillón a la calle</h2>
+          </div>
+          <p class="gallery__note">Imágenes de muestra. Aquí irán fotos de vuestros trabajos.</p>
+        </header>
+        <div class="gallery__grid">
+          <figure class="g g--tall reveal"><img data-foto="g1" alt="Trabajo de peluquería (muestra)" loading="lazy"></figure>
+          <figure class="g reveal"><img data-foto="g2" alt="Trabajo de peluquería (muestra)" loading="lazy"></figure>
+          <figure class="g reveal"><img data-foto="g3" alt="Trabajo de peluquería (muestra)" loading="lazy"></figure>
+          <figure class="g g--tall reveal"><img data-foto="g4" alt="Trabajo de peluquería (muestra)" loading="lazy"></figure>
+          <figure class="g reveal"><img data-foto="g5" alt="Trabajo de peluquería (muestra)" loading="lazy"></figure>
+          <figure class="g reveal"><img data-foto="g6" alt="Trabajo de peluquería (muestra)" loading="lazy"></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CÓMO RESERVAR ============ -->
+    <section class="steps container">
+      <header class="section-head reveal">
+        <p class="eyebrow">Reservar es fácil</p>
+        <h2 class="h2">Reserva sin llamar</h2>
+      </header>
+      <ol class="steps__list">
+        <li class="reveal"><span class="steps__n">1</span><h3>Elige el servicio</h3><p>Corte, pack, color o cejas. Con precio y duración a la vista.</p></li>
+        <li class="reveal"><span class="steps__n">2</span><h3>Con quién y cuándo</h3><p>Solo ves huecos realmente libres, según lo que dura tu servicio.</p></li>
+        <li class="reveal"><span class="steps__n">3</span><h3>Confirmado</h3><p>Te llega la confirmación y un recordatorio el día antes.</p></li>
+      </ol>
+      <div class="steps__cta reveal">
+        <a href="#reservar" data-book class="btn btn--brass">Reservar ahora <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <!-- ============ HORARIO Y UBICACIÓN ============ -->
+    <section class="visit" id="visitanos">
+      <div class="container visit__grid">
+        <div class="visit__info reveal">
+          <p class="eyebrow">Visítanos</p>
+          <h2 class="h2">Horario y ubicación</h2>
+
+          <table class="hours" data-hours>
+            <caption class="sr-only">Horario de apertura</caption>
+            <tbody>
+              <tr data-day="1"><th scope="row">Lunes</th><td>10:30 – 14:00</td><td>16:00 – 20:00</td></tr>
+              <tr data-day="2"><th scope="row">Martes</th><td>10:30 – 14:00</td><td>16:00 – 20:00</td></tr>
+              <tr data-day="3"><th scope="row">Miércoles</th><td>10:30 – 14:00</td><td>16:00 – 20:00</td></tr>
+              <tr data-day="4"><th scope="row">Jueves</th><td>10:30 – 14:00</td><td>16:00 – 20:00</td></tr>
+              <tr data-day="5"><th scope="row">Viernes</th><td>10:30 – 14:00</td><td>16:00 – 20:30</td></tr>
+              <tr data-day="6"><th scope="row">Sábado</th><td>10:30 – 15:00</td><td></td></tr>
+              <tr data-day="0"><th scope="row">Domingo</th><td colspan="2" class="closed">Cerrado</td></tr>
+            </tbody>
+          </table>
+
+          <address class="contact">
+            <p><span class="contact__label">Dirección</span>Calle Clara Campoamor, 1<br>12003 Castellón de la Plana</p>
+            <p><span class="contact__label">Teléfono</span><a href="tel:+34667005750">667 00 57 50</a></p>
+            <p><span class="contact__label">Email</span><a href="mailto:cristianlincastro@gmail.com">cristianlincastro@gmail.com</a></p>
+          </address>
+
+          <div class="visit__ctas">
+            <a class="btn btn--brass" href="https://www.google.com/maps/dir/?api=1&destination=Calle+Clara+Campoamor+1,+12003+Castell%C3%B3n+de+la+Plana" target="_blank" rel="noopener">Cómo llegar</a>
+            <a class="btn btn--ghost" href="https://wa.me/34667005750" target="_blank" rel="noopener">WhatsApp</a>
+          </div>
+        </div>
+
+        <div class="visit__map reveal">
+          <iframe title="Mapa: Peluquería Castro, Calle Clara Campoamor 1, Castellón"
+            src="https://maps.google.com/maps?q=Calle%20Clara%20Campoamor%201%2C%2012003%20Castell%C3%B3n%20de%20la%20Plana&z=16&output=embed"
+            loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA FINAL ============ -->
+    <section class="final">
+      <img class="final__bg" data-foto="final" alt="" loading="lazy">
+      <div class="final__shade"></div>
+      <div class="final__content container reveal">
+        <h2 class="h2">¿Te toca <em>corte</em>?</h2>
+        <p>Reserva en un minuto. Te esperamos en Clara Campoamor.</p>
+        <a href="#reservar" data-book class="btn btn--brass">Reservar cita <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ PIE ============ -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="#inicio" class="logo logo--footer" aria-label="Peluquería Castro, volver arriba">
+        <span class="logo__mark" aria-hidden="true">C</span>
+        <span class="logo__text"><span class="logo__name">Castro</span><span class="logo__sub">Peluquería · Barbería</span></span>
+      </a>
+      <p class="footer__meta">Calle Clara Campoamor, 1 · 12003 Castellón · <a href="tel:+34667005750">667 00 57 50</a></p>
+      <p class="footer__legal">© <span data-year>2026</span> Peluquería Castro · Propuesta de diseño (demo) · <a href="panel.html">Panel del equipo</a></p>
+    </div>
+  </footer>
+
+  <!-- Barra fija de acciones en móvil -->
+  <nav class="dock" aria-label="Acciones rápidas">
+    <a href="tel:+34667005750" class="dock__btn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2Z"/></svg>
+      Llamar
+    </a>
+    <a href="https://wa.me/34667005750" class="dock__btn" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s1 2.6 1.1 2.7c.1.2 1.9 3 4.7 4.2 1.7.7 2.4.8 3.3.7.5-.1 1.5-.6 1.8-1.3.2-.6.2-1.1.1-1.3l-.3-.2Z"/></svg>
+      WhatsApp
+    </a>
+    <a href="#reservar" data-book class="dock__btn dock__btn--main">Reservar cita</a>
+  </nav>
+
+  <script src="js/datos.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/reservas.js" defer></script>
+</body>
+</html>

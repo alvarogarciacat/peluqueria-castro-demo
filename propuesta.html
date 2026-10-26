@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Propuesta · Peluquería Castro</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#0f0e0c; --ink-2:#161412; --bone:#ede6da; --muted:#a39b8f; --brass:#c8a46a; --line:rgba(237,230,218,.12); }
+    * { box-sizing: border-box; }
+    body { margin:0; background: radial-gradient(90% 60% at 50% 0%, #241f19 0%, var(--ink) 60%); color:var(--bone); font:16px/1.6 Manrope, system-ui, sans-serif; min-height:100vh; }
+    a { color: inherit; }
+    .wrap { max-width: 1320px; margin: 0 auto; padding: 48px 16px 80px; }
+    .top { text-align:center; margin-bottom: 48px; }
+    .eyebrow { font-size:12px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--brass); margin:0 0 14px; }
+    h1 { font-family:"Instrument Serif", serif; font-weight:400; font-size:clamp(40px,6vw,72px); line-height:1; margin:0 0 16px; }
+    h1 em { color:#dcbd88; }
+    .lead { color:var(--muted); max-width:56ch; margin:0 auto 26px; }
+    .btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .btn { display:inline-flex; align-items:center; min-height:48px; padding:0 24px; border-radius:4px; text-decoration:none; font-weight:600; font-size:15px; }
+    .btn--brass { background:var(--brass); color:var(--ink); }
+    .btn--ghost { border:1px solid rgba(237,230,218,.35); }
+
+    .stage { display:flex; gap:48px; align-items:flex-end; justify-content:center; }
+    .label { text-align:center; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-top:16px; }
+
+    /* Portátil: iframe a 1440px escalado */
+    .laptop { flex: 1 1 auto; max-width: 900px; }
+    .laptop__screen { position:relative; background:#000; border:12px solid #1d1b19; border-bottom-width:16px; border-radius:14px 14px 0 0; aspect-ratio: 16/10; overflow:hidden; }
+    .laptop__screen iframe { position:absolute; top:0; left:0; width:1440px; height:900px; border:0; transform-origin:0 0; }
+    .laptop__base { height:16px; background:linear-gradient(#2a2724,#141210); border-radius:0 0 18px 18px; margin:0 -5%; }
+
+    /* Móvil: iframe 390x844 */
+    .phone { flex: 0 0 auto; }
+    .phone__body { width: 300px; height: 630px; padding:12px; background:#1d1b19; border-radius:46px; box-shadow: 0 0 0 1px #34302b, 0 30px 80px rgba(0,0,0,.5); position:relative; }
+    .phone__screen { width:100%; height:100%; border-radius:36px; overflow:hidden; position:relative; background:#000; }
+    .phone__screen iframe { position:absolute; top:0; left:0; width:390px; height:820px; border:0; transform-origin:0 0; }
+    .phone__notch { position:absolute; top:22px; left:50%; transform:translateX(-50%); width:86px; height:24px; background:#000; border-radius:20px; z-index:2; }
+
+    .points { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:72px; border-top:1px solid var(--line); padding-top:40px; }
+    .points h3 { font-family:"Instrument Serif", serif; font-weight:400; font-size:26px; margin:0 0 6px; }
+    .points p { color:var(--muted); font-size:14px; margin:0; }
+
+    @media (max-width: 960px) {
+      .stage { flex-direction:column; align-items:center; }
+      .laptop { display:none; }
+      .points { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width: 520px) { .points { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <p class="eyebrow">Propuesta de rediseño</p>
+      <h1>Peluquería <em>Castro</em></h1>
+      <p class="lead">Así se vería vuestra web en el móvil y en el ordenador. Los clientes reservan sin salir de ella y cada barbero tiene su agenda en el móvil. Con el botón «Ajustes» de la web podéis probar colores, letras y fotos.</p>
+      <div class="btns">
+        <a class="btn btn--brass" href="./">Abrir la web completa</a>
+        <a class="btn btn--ghost" href="panel.html">Panel del equipo</a>
+        <a class="btn btn--ghost" href="tipografias.html">Comparar tipografías</a>
+      </div>
+    </header>
+
+    <div class="stage">
+      <div class="laptop">
+        <div class="laptop__screen" data-scale="1440"><iframe src="./" title="Vista en ordenador" loading="lazy"></iframe></div>
+        <div class="laptop__base"></div>
+        <p class="label">Ordenador</p>
+      </div>
+      <div class="phone">
+        <div class="phone__body">
+          <div class="phone__notch"></div>
+          <div class="phone__screen" data-scale="390"><iframe src="./" title="Vista en móvil" loading="lazy"></iframe></div>
+        </div>
+        <p class="label">Móvil</p>
+      </div>
+    </div>
+
+    <section class="points">
+      <div><h3>Reserva propia</h3><p>Servicio, barbero y hora en un minuto, sin salir de la web. Solo se ofrecen huecos libres de verdad.</p></div>
+      <div><h3>Agenda por barbero</h3><p>Cada uno ve sus citas del día en el móvil, bloquea ratos y cancela. Se actualiza al momento.</p></div>
+      <div><h3>Guía de cortes</h3><p>El cliente elige el estilo al reservar y el barbero lo sabe antes de que llegue.</p></div>
+      <div><h3>Imagen premium</h3><p>Pensada primero para el móvil, con llamar, WhatsApp y reservar siempre a mano.</p></div>
+    </section>
+  </div>
+
+  <script>
+    // Escala cada iframe al ancho de su marco
+    const fit = () => document.querySelectorAll('[data-scale]').forEach((box) => {
+      const f = box.querySelector('iframe');
+      const s = box.clientWidth / Number(box.dataset.scale);
+      f.style.transform = `scale(${s})`;
+      f.style.height = (box.clientHeight / s) + 'px';
+    });
+    addEventListener('resize', fit); addEventListener('load', fit); fit();
+  </script>
+</body>
+</html>
