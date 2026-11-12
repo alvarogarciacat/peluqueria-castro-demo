@@ -24,13 +24,13 @@ window.Castro = (() => {
     { id: 'castro', name: 'Castro Dos Santos', short: 'Castro', ini: 'CD' },
   ];
 
-  // Estilos de la guía de cortes (alturas del degradado). top/bottom: dónde empieza y acaba el degradado en la ilustración.
+  // Estilos de la guía de cortes (alturas del degradado). top/bottom: dónde empieza y acaba el degradado en el perfil (oreja ≈ 66–96).
   const STYLES = [
-    { id: 'taper', name: 'Taper', desc: 'Degradado solo en patillas y nuca. El más discreto: queda bien a cualquier edad.', top: 86, bottom: 106 },
-    { id: 'low', name: 'Low fade', desc: 'Empieza justo por encima de la oreja. Limpio y fácil de llevar.', top: 72, bottom: 94 },
-    { id: 'mid', name: 'Mid fade', desc: 'Arranca a media altura, a la altura de la sien. El equilibrio entre clásico y moderno.', top: 56, bottom: 80 },
-    { id: 'high', name: 'High fade', desc: 'Sube casi hasta la coronilla. Máximo contraste con la parte de arriba.', top: 40, bottom: 64 },
-    { id: 'buzz', name: 'Rapado', desc: 'Todo corto y a la misma altura. Cero mantenimiento.', buzz: true },
+    { id: 'taper', name: 'Taper', desc: 'Degradado solo en patillas y nuca. El más discreto: queda bien a cualquier edad.', top: 96, bottom: 120 },
+    { id: 'low', name: 'Low fade', desc: 'Empieza justo por encima de la oreja. Limpio y fácil de llevar.', top: 70, bottom: 98 },
+    { id: 'mid', name: 'Mid fade', desc: 'Arranca a media altura, a la altura de la sien. El equilibrio entre clásico y moderno.', top: 56, bottom: 84 },
+    { id: 'high', name: 'High fade', desc: 'Sube casi hasta la coronilla. Máximo contraste con la parte de arriba.', top: 40, bottom: 68 },
+    { id: 'buzz', name: 'Rapado', desc: 'Todo corto y a la misma altura. Cero mantenimiento.', buzz: true, top: 20, bottom: 120 },
   ];
 
   // Minutos desde medianoche. 0 = domingo.
@@ -165,24 +165,51 @@ window.Castro = (() => {
   }
 
   // ---------- ilustración de la guía de cortes ----------
+  // Perfil lateral: pelo arriba, degradado con textura de rapado y una maquinilla que sube por el degradado (animada por CSS).
+  const HEAD = 'M58 30C74 14 112 12 128 32C140 48 140 78 130 96C125 106 118 112 114 118L116 170H72V130C64 128 56 126 52 121C48 117 47 112 49 108C47 106 46 103 48 100C46 98 45 95 47 92L40 86C42 80 45 76 47 70C47 58 50 42 58 30Z';
+  const ZONE = 'M50 50C62 44 78 46 88 52L90 86H94C93 72 96 65 102 64C111 64 114 74 112 92L114 122H150V0H30V50Z';
+  const VOLUME = 'M49 52C38 34 52 11 80 8C108 5 134 17 137 40C138 48 136 54 132 60L126 34C110 14 74 15 58 30Z';
   function styleSvg(style, uid = style.id) {
-    const g = `g-${uid}`, c = `c-${uid}`;
-    const hair = style.buzz
-      ? `<rect x="0" y="0" width="120" height="140" fill="var(--hair, #c8a46a)" opacity=".42" clip-path="url(#${c})"/>`
-      : `<defs><linearGradient id="${g}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="140">
-           <stop offset="${style.top / 140}" stop-color="var(--hair, #c8a46a)"/>
-           <stop offset="${style.bottom / 140}" stop-color="var(--hair, #c8a46a)" stop-opacity="0"/>
-         </linearGradient></defs>
-         <path d="M23 50 C 22 2, 98 2, 97 50 C 90 28, 30 28, 23 50 Z" fill="var(--hair, #c8a46a)"/>
-         <rect x="0" y="0" width="120" height="140" fill="url(#${g})" clip-path="url(#${c})"/>
-         <line x1="16" x2="104" y1="${style.top}" y2="${style.top}" stroke="var(--fg, #ede6da)" stroke-width=".8" stroke-dasharray="2 3" opacity=".55" clip-path="url(#${c})"/>`;
-    return `<svg viewBox="0 0 120 140" class="cut-svg" role="img" aria-label="${esc(tf('cut.back', '{name} visto desde atrás', { name: styleName(style) }))}">
-      <defs><clipPath id="${c}"><ellipse cx="60" cy="64" rx="38" ry="46"/></clipPath></defs>
-      <path d="M44 100 L44 140 L76 140 L76 100 Z" fill="var(--skin, #26221e)" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1"/>
-      <ellipse cx="22" cy="74" rx="7" ry="12" fill="var(--skin, #26221e)" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1"/>
-      <ellipse cx="98" cy="74" rx="7" ry="12" fill="var(--skin, #26221e)" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1"/>
-      <ellipse cx="60" cy="64" rx="38" ry="46" fill="var(--skin, #26221e)" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1"/>
-      ${hair}
+    const id = (k) => `${k}-${uid}`;
+    const { top, bottom } = style;
+    const hairTop = style.buzz ? '' : `
+      <g clip-path="url(#${id('t')})">
+        <path d="${VOLUME}" fill="var(--hair, #c8a46a)"/>
+        <g clip-path="url(#${id('h')})"><rect x="0" y="0" width="160" height="${top}" fill="var(--hair, #c8a46a)" clip-path="url(#${id('z')})"/></g>
+        <path d="M60 28C74 18 96 16 112 22M54 40C68 28 92 26 118 34M66 16C84 10 108 12 124 26" fill="none" stroke="var(--skin, #26221e)" stroke-width="1.2" stroke-linecap="round" opacity=".35"/>
+      </g>`;
+    return `<svg viewBox="0 0 160 170" class="cut-svg" role="img" aria-label="${esc(tf('cut.back', '{name} visto de perfil', { name: styleName(style) }))}">
+      <defs>
+        <clipPath id="${id('h')}"><path d="${HEAD}"/></clipPath>
+        <clipPath id="${id('z')}"><path d="${ZONE}"/></clipPath>
+        <clipPath id="${id('t')}"><rect x="0" y="0" width="160" height="${top}"/></clipPath>
+        <linearGradient id="${id('g')}" gradientUnits="userSpaceOnUse" x1="0" y1="${top}" x2="0" y2="${bottom}">
+          <stop offset="0" stop-color="var(--hair, #c8a46a)" stop-opacity="${style.buzz ? '.5' : '1'}"/>
+          <stop offset="1" stop-color="var(--hair, #c8a46a)" stop-opacity="${style.buzz ? '.4' : '0'}"/>
+        </linearGradient>
+        <pattern id="${id('p')}" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r=".7" fill="var(--hair, #c8a46a)"/></pattern>
+      </defs>
+      <path d="${HEAD}" fill="var(--skin, #26221e)"/>
+      <g clip-path="url(#${id('h')})">
+        <g clip-path="url(#${id('z')})">
+          <rect x="0" y="${top}" width="160" height="${bottom - top}" fill="url(#${id('g')})"/>
+          <rect x="0" y="${top}" width="160" height="${Math.max(0, 122 - top)}" fill="url(#${id('p')})" opacity="${style.buzz ? '.9' : '.45'}"/>
+        </g>
+      </g>
+      ${hairTop}
+      <path d="${HEAD}" fill="none" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M101 66C108 64 112 72 111 82C110 92 104 97 99 95C96 94 95 90 97 87C99 84 97 80 98 76" fill="var(--skin, #26221e)" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1.2" stroke-linejoin="round"/>
+      <path d="M103 74C106 75 107 80 105 85" fill="none" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1" stroke-linecap="round"/>
+      <path d="M50 64C54 61 59 61 63 63" fill="none" stroke="var(--hair, #c8a46a)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M52 71C55 69 58 69 61 71" fill="none" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1.2" stroke-linecap="round"/>
+      ${style.buzz ? '' : `<line x1="86" x2="140" y1="${top}" y2="${top}" stroke="var(--fg, #ede6da)" stroke-width=".8" stroke-dasharray="2 3" opacity=".55" clip-path="url(#${id('h')})"/>`}
+      <g transform="translate(142 0)" aria-hidden="true">
+        <g class="cut-clip" style="--b:${bottom}px;--t:${top}px">
+          <rect x="0" y="-5" width="24" height="10" rx="4" fill="var(--fg, #ede6da)"/>
+          <rect x="-4" y="-6" width="5" height="12" rx="1.5" fill="var(--hair, #c8a46a)"/>
+          <path d="M-4 -4H-6M-4 0H-6M-4 4H-6" stroke="var(--hair, #c8a46a)" stroke-width="1.2"/>
+        </g>
+      </g>
     </svg>`;
   }
 
