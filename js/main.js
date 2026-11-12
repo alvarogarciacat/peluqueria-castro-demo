@@ -3,24 +3,27 @@
   const $ = (s, el = document) => el.querySelector(s);
   const C = window.Castro;
   const { HOURS, esc, hhmm, durTxt } = C;
-  const DAY_NAMES = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  const t = (key, fb, vars) => C.tf(key, fb, vars);
+  const DAY_FB = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
   const fmt = (m) => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
 
   // --- Abierto / cerrado (hora de Madrid)
   function statusText({ ymd, min }) {
     const day = C.dow(ymd);
     const open = HOURS[day].find(([a, b]) => min >= a && min < b);
-    if (open) return { open: true, text: `Abierto ahora · hasta las ${fmt(open[1])}` };
+    if (open) return { open: true, text: t('status.open', 'Abierto ahora · hasta las {time}', { time: fmt(open[1]) }) };
     const laterToday = HOURS[day].find(([a]) => a > min);
-    if (laterToday) return { open: false, text: `Cerrado · abre hoy a las ${fmt(laterToday[0])}` };
+    if (laterToday) return { open: false, text: t('status.today', 'Cerrado · abre hoy a las {time}', { time: fmt(laterToday[0]) }) };
     for (let i = 1; i <= 7; i++) {
       const d = (day + i) % 7;
       if (HOURS[d].length) {
-        const when = i === 1 ? 'mañana' : `el ${DAY_NAMES[d]}`;
-        return { open: false, text: `Cerrado · abre ${when} a las ${fmt(HOURS[d][0][0])}` };
+        const time = fmt(HOURS[d][0][0]);
+        return { open: false, text: i === 1
+          ? t('status.tomorrow', 'Cerrado · abre mañana a las {time}', { time })
+          : t('status.day', 'Cerrado · abre el {day} a las {time}', { day: t(`day.${d}`, DAY_FB[d]), time }) };
       }
     }
-    return { open: false, text: 'Cerrado' };
+    return { open: false, text: t('closed', 'Cerrado') };
   }
   function updateStatus() {
     const now = C.madridNow();
@@ -39,35 +42,40 @@
   setInterval(updateStatus, 60 * 1000);
 
   // --- Carta de servicios (desde datos.js)
+  let revealed = false; // tras el primer pintado, lo que se vuelve a dibujar al cambiar de idioma ya entra visible
+  const rv = () => `reveal${revealed ? ' is-in' : ''}`;
   const menu = $('[data-menu]');
-  if (menu) {
+  function renderMenu() {
     const cats = [...new Set(C.SERVICES.map((s) => s.cat))];
     menu.innerHTML = cats.map((cat, i) => `
-      <div class="menu__group reveal">
-        <h3 class="menu__title"><span>${String(i + 1).padStart(2, '0')}</span> ${esc(cat)}</h3>
+      <div class="menu__group ${rv()}">
+        <h3 class="menu__title"><span>${String(i + 1).padStart(2, '0')}</span> ${esc(C.catName(cat))}</h3>
         <ul>${C.SERVICES.filter((s) => s.cat === cat).map((s) => `
           <li><a class="item" href="#reservar" data-book data-service="${s.id}">
-            <span class="item__name">${esc(s.name)}${s.id === 'completo' ? ' <b class="tag">Completo</b>' : ''}
-              <small>${esc([s.note, durTxt(s.dur)].filter(Boolean).join(' · '))}</small></span>
+            <span class="item__name">${esc(C.svcName(s))}${s.id === 'completo' ? ` <b class="tag">${esc(t('tag.complete', 'Completo'))}</b>` : ''}
+              <small>${esc([C.svcNote(s), durTxt(s.dur)].filter(Boolean).join(' · '))}</small></span>
             <span class="item__dots"></span>
-            <span class="item__price">${s.from ? '<i>desde</i> ' : ''}${s.price} €</span>
+            <span class="item__price">${s.from ? `<i>${esc(t('from', 'desde'))}</i> ` : ''}${s.price} €</span>
           </a></li>`).join('')}
         </ul>
-        ${cat === 'Depilación con hilo' ? '<p class="menu__note">¿Dudas con el color o un diseño concreto? Escríbenos por WhatsApp con una foto de referencia y te orientamos.</p>' : ''}
+        ${C.catKey(cat) === 'hilo' ? `<p class="menu__note">${esc(t('menu.note', '¿Dudas con el color o un diseño concreto? Escríbenos por WhatsApp con una foto de referencia y te orientamos.'))}</p>` : ''}
       </div>`).join('');
   }
 
   // --- Guía de cortes (ilustraciones generadas en datos.js)
   const cuts = $('[data-cuts]');
-  if (cuts) {
+  function renderCuts() {
     cuts.innerHTML = C.STYLES.map((s) => `
-      <article class="cut reveal">
+      <article class="cut ${rv()}">
         <div class="cut__art">${C.styleSvg(s)}</div>
-        <h3>${esc(s.name)}</h3>
-        <p>${esc(s.desc)}</p>
-        <a href="#reservar" class="link" data-book data-service="fade" data-style="${s.id}">Reservar ${esc(s.name)} <span aria-hidden="true">→</span></a>
+        <h3>${esc(C.styleName(s))}</h3>
+        <p>${esc(C.styleDesc(s))}</p>
+        <a href="#reservar" class="link" data-book data-service="fade" data-style="${s.id}">${esc(t('cut.book', 'Reservar {name}', { name: C.styleName(s) }))} <span aria-hidden="true">→</span></a>
       </article>`).join('');
   }
+
+  if (menu) renderMenu();
+  if (cuts) renderCuts();
 
   // --- Cabecera sólida al hacer scroll + dock móvil
   const header = $('[data-header]');
@@ -85,7 +93,7 @@
   const nav = $('[data-nav]');
   const setMenu = (open) => {
     burger.setAttribute('aria-expanded', String(open));
-    burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    burger.setAttribute('aria-label', open ? t('burger.close', 'Cerrar menú') : t('burger.open', 'Abrir menú'));
     nav.classList.toggle('is-open', open);
     header.classList.toggle('menu-open', open);
     document.body.style.overflow = open ? 'hidden' : '';
@@ -106,6 +114,12 @@
   } else {
     items.forEach((el) => el.classList.add('is-in'));
   }
+
+  revealed = true;
+
+  // --- Cambio de idioma
+  const renderLang = () => { if (menu) renderMenu(); if (cuts) renderCuts(); updateStatus(); setMenu(burger.getAttribute('aria-expanded') === 'true'); };
+  window.addEventListener('castro:lang', renderLang);
 
   // --- Año del pie
   const y = $('[data-year]');

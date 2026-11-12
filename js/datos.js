@@ -45,7 +45,20 @@ window.Castro = (() => {
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
   const durTxt = (d) => (d < 60 ? `${d} min` : `${Math.floor(d / 60)} h${d % 60 ? ` ${d % 60} min` : ''}`);
-  const priceTxt = (s) => `${s.from ? 'desde ' : ''}${s.price} €`;
+
+  // Idioma: el panel no carga js/i18n.js y se queda en español
+  const I = () => window.I18N;
+  const tr = (key, fb) => (I() ? I().tr(key, fb) : fb);
+  const tf = (key, fb, vars) => { const s = tr(key, fb); return vars ? s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '') : s; };
+  const priceTxt = (s) => `${s.from ? `${tr('from', 'desde')} ` : ''}${s.price} €`;
+  const CAT_KEYS = { 'Cortes': 'cortes', 'Packs': 'packs', 'Color y química': 'color', 'Depilación con hilo': 'hilo' };
+  const catKey = (cat) => CAT_KEYS[cat] || cat;
+  const catName = (cat) => tr(`cat.${catKey(cat)}`, cat);
+  const svcName = (s) => tr(`svc.${s.id}`, s.name);
+  const svcNote = (s) => (s.note ? tr(`svc.${s.id}.note`, s.note) : '');
+  const styleName = (st) => tr(`style.${st.id}`, st.name);
+  const styleDesc = (st) => tr(`style.${st.id}.desc`, st.desc);
+  const barberRole = () => tr('bk.barber.role', 'Barbero');
 
   function madridNow() {
     const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {
@@ -56,7 +69,7 @@ window.Castro = (() => {
   const toDate = (ymd) => new Date(`${ymd}T12:00:00Z`);
   const addDays = (ymd, n) => { const d = toDate(ymd); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
   const dow = (ymd) => toDate(ymd).getUTCDay();
-  const fmtDay = (ymd, opts) => new Intl.DateTimeFormat('es-ES', { timeZone: 'UTC', ...opts }).format(toDate(ymd));
+  const fmtDay = (ymd, opts) => new Intl.DateTimeFormat(I() ? I().locale : 'es-ES', { timeZone: 'UTC', ...opts }).format(toDate(ymd));
   const longDate = (ymd) => fmtDay(ymd, { weekday: 'long', day: 'numeric', month: 'long' });
 
   // Hash determinista → [0,1): la agenda simulada es estable para cada día y barbero
@@ -119,7 +132,7 @@ window.Castro = (() => {
          <path d="M23 50 C 22 2, 98 2, 97 50 C 90 28, 30 28, 23 50 Z" fill="var(--hair, #c8a46a)"/>
          <rect x="0" y="0" width="120" height="140" fill="url(#${g})" clip-path="url(#${c})"/>
          <line x1="16" x2="104" y1="${style.top}" y2="${style.top}" stroke="var(--fg, #ede6da)" stroke-width=".8" stroke-dasharray="2 3" opacity=".55" clip-path="url(#${c})"/>`;
-    return `<svg viewBox="0 0 120 140" class="cut-svg" role="img" aria-label="${esc(style.name)} visto desde atrás">
+    return `<svg viewBox="0 0 120 140" class="cut-svg" role="img" aria-label="${esc(tf('cut.back', '{name} visto desde atrás', { name: styleName(style) }))}">
       <defs><clipPath id="${c}"><ellipse cx="60" cy="64" rx="38" ry="46"/></clipPath></defs>
       <path d="M44 100 L44 140 L76 140 L76 100 Z" fill="var(--skin, #26221e)" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1"/>
       <ellipse cx="22" cy="74" rx="7" ry="12" fill="var(--skin, #26221e)" stroke="var(--outline, rgba(237,230,218,.35))" stroke-width="1"/>
@@ -131,6 +144,7 @@ window.Castro = (() => {
 
   return {
     SERVICES, BARBERS, STYLES, HOURS, STEP, KEYS,
+    tr, tf, catKey, catName, svcName, svcNote, styleName, styleDesc, barberRole,
     esc, hhmm, durTxt, priceTxt, madridNow, addDays, dow, fmtDay, longDate, rnd,
     load, save, snapshot, busyReason, barberFree, slotsFor, styleSvg,
   };

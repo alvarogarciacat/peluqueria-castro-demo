@@ -1,4 +1,4 @@
-// Peluquería Castro · ajustes de la demo: colores, tipografía y fotos (combinables) + 5 combinaciones.
+// Peluquería Castro · ajustes de la demo: idioma (si la página carga js/i18n.js), colores, tipografía y fotos (combinables) + 5 combinaciones.
 // Se carga en <head> (sin defer) para aplicar el tema antes de pintar y evitar parpadeos.
 // Solo existe en la demo: en la web final se fija el tema elegido y este archivo desaparece.
 (() => {
@@ -110,7 +110,7 @@
       const k = b.dataset.k, v = b.dataset.v;
       const on = k === 'preset'
         ? ['color', 'tipo', 'fotos'].every((x) => PRESETS[v][x] === cur[x])
-        : cur[k] === v;
+        : k === 'lang' ? window.I18N.lang === v : cur[k] === v;
       b.setAttribute('aria-pressed', String(on));
     });
   }
@@ -129,12 +129,16 @@
     const chip = (k, v, inner, cls = '') => `<button type="button" class="aj-opt ${cls}" data-k="${k}" data-v="${v}" aria-pressed="false">${inner}</button>`;
     const sw = (c) => `<span class="aj-sw">${c.map((x) => `<i style="background:${x}"></i>`).join('')}</span>`;
     const aa = (t) => `<span class="aj-aa" style="font-family:${t.family};${t.style || ''}">Aa</span>`;
+    const L = window.I18N; // solo en las páginas que cargan js/i18n.js (la web; el panel del equipo sigue en español)
+    const idioma = L ? `
+        <h3 class="aj-h">Idioma</h3>
+        <div class="aj-grid">${Object.entries(L.LANGS).map(([id, l]) => chip('lang', id, `<span class="aj-aa" style="font-size:16px;font-weight:700">${l.short}</span><span class="aj-name">${l.name}</span>`)).join('')}</div>` : '';
     ui.innerHTML = `
       <div class="aj-head">
         <div><p class="aj-title">Ajustes de la demo</p><p class="aj-sub">Prueba combinaciones. Esto no aparecerá en la web final.</p></div>
         <button type="button" class="aj-x" data-aj-close aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
-      <div class="aj-body">
+      <div class="aj-body">${idioma}
         <h3 class="aj-h">Combinaciones listas</h3>
         <div class="aj-grid aj-grid--presets">
           ${Object.entries(PRESETS).map(([id, p]) => chip('preset', id, `
@@ -161,6 +165,7 @@
       if (e.target.closest('[data-aj-reset]')) return set({ ...DEFAULT });
       const b = e.target.closest('[data-k]');
       if (!b) return;
+      if (b.dataset.k === 'lang') { window.I18N.set(b.dataset.v); syncUi(); return; }
       if (b.dataset.k === 'preset') { const p = PRESETS[b.dataset.v]; set({ color: p.color, tipo: p.tipo, fotos: p.fotos }); }
       else set({ [b.dataset.k]: b.dataset.v });
     });
@@ -168,6 +173,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => { applyPhotos(); buildUi(); });
+  window.addEventListener('castro:lang', syncUi);
   // Si se cambia el tema en otra pestaña (p. ej. web y panel abiertos a la vez)
   window.addEventListener('storage', (e) => {
     if (e.key === STORE && !fromUrl) { cur = { ...DEFAULT, ...read() }; apply(); }

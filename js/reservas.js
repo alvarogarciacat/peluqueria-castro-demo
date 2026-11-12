@@ -5,7 +5,9 @@
   const C = window.Castro;
   const { SERVICES, BARBERS, STYLES, esc, hhmm, durTxt, priceTxt, madridNow, addDays, dow, fmtDay, longDate } = C;
   const DAYS_AHEAD = 21;
-  const STEPS = ['Servicio', 'Barbero', 'Día y hora', 'Tus datos'];
+  const t = (key, fb, vars) => C.tf(key, fb, vars);
+  const STEPS = [['bk.step.1', 'Servicio'], ['bk.step.2', 'Barbero'], ['bk.step.3', 'Día y hora'], ['bk.step.4', 'Tus datos']];
+  const stepName = (i) => t(STEPS[i][0], STEPS[i][1]);
   const $ = (s, el = document) => el.querySelector(s);
 
   // ---------- estado ----------
@@ -23,8 +25,8 @@
   dlg.innerHTML = `
     <div class="bk-head">
       <div class="bk-top">
-        <h2 class="bk-title" id="bk-title">Reserva tu cita</h2>
-        <button class="bk-close" type="button" aria-label="Cerrar" data-close>
+        <h2 class="bk-title" id="bk-title" data-i18n="bk.title">Reserva tu cita</h2>
+        <button class="bk-close" type="button" aria-label="Cerrar" data-i18n-attr="aria-label:bk.close" data-close>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
       </div>
@@ -33,7 +35,7 @@
     </div>
     <div class="bk-body" data-body></div>
     <div class="bk-foot" data-foot>
-      <button class="btn btn--ghost btn--sm bk-back" type="button" data-back>Atrás</button>
+      <button class="btn btn--ghost btn--sm bk-back" type="button" data-back data-i18n="bk.back">Atrás</button>
       <div class="bk-summary" data-summary></div>
       <button class="btn btn--brass btn--sm" type="button" data-next>Continuar</button>
     </div>`;
@@ -44,7 +46,7 @@
     const done = !!st.done;
     dlg.classList.toggle('is-done', done);
     dlg.querySelectorAll('.bk-progress span').forEach((s, i) => s.classList.toggle('is-on', done || i <= st.step));
-    $('[data-steplabel]', dlg).textContent = done ? 'Reserva confirmada' : `Paso ${st.step + 1} de ${STEPS.length} · ${STEPS[st.step]}`;
+    $('[data-steplabel]', dlg).textContent = done ? t('bk.confirmed', 'Reserva confirmada') : t('bk.stepLabel', 'Paso {n} de {total} · {name}', { n: st.step + 1, total: STEPS.length, name: stepName(st.step) });
 
     body.innerHTML = done ? viewDone() : [viewService, viewBarber, viewWhen, viewForm][st.step]();
     body.scrollTop = 0;
@@ -53,7 +55,7 @@
     const next = $('[data-next]', dlg);
     back.hidden = done || st.step === 0;
     next.hidden = done;
-    next.textContent = st.step === 3 ? 'Confirmar reserva' : 'Continuar';
+    next.textContent = st.step === 3 ? t('bk.confirm', 'Confirmar reserva') : t('bk.next', 'Continuar');
     next.disabled = ![!!st.service, !!st.barber, !!st.slot, true][st.step];
     $('[data-summary]', dlg).innerHTML = done ? '' : summary();
 
@@ -62,27 +64,27 @@
   }
 
   function summary() {
-    if (!st.service) return '<span>Elige un servicio</span>';
+    if (!st.service) return `<span>${esc(t('bk.pickService', 'Elige un servicio'))}</span>`;
     const bid = st.slot ? st.slot.barber : st.barber !== 'any' ? st.barber : null;
     const b = BARBERS.find((x) => x.id === bid);
     const parts = [priceTxt(st.service), durTxt(st.service.dur)];
     if (b) parts.push(b.short);
     if (st.slot) parts.push(`${fmtDay(st.date, { weekday: 'short', day: 'numeric' })} · ${hhmm(st.slot.time)}`);
-    return `<strong>${esc(st.service.name)}</strong><span>${esc(parts.join(' · '))}</span>`;
+    return `<strong>${esc(C.svcName(st.service))}</strong><span>${esc(parts.join(' · '))}</span>`;
   }
 
   // Paso 1 · servicio
   function viewService() {
     const cats = [...new Set(SERVICES.map((s) => s.cat))];
     return cats.map((c) => `
-      <h3 class="bk-cat">${esc(c)}</h3>
+      <h3 class="bk-cat">${esc(C.catName(c))}</h3>
       ${SERVICES.filter((s) => s.cat === c).map((s) => `
         <button type="button" class="bk-option" data-pick-service="${s.id}" aria-pressed="${st.service?.id === s.id}">
           <span class="bk-option__main">
-            <span class="bk-option__name">${esc(s.name)}</span>
-            <span class="bk-option__meta">${esc([s.note, durTxt(s.dur)].filter(Boolean).join(' · '))}</span>
+            <span class="bk-option__name">${esc(C.svcName(s))}</span>
+            <span class="bk-option__meta">${esc([C.svcNote(s), durTxt(s.dur)].filter(Boolean).join(' · '))}</span>
           </span>
-          <span class="bk-option__price">${s.from ? '<i>desde</i> ' : ''}${s.price} €</span>
+          <span class="bk-option__price">${s.from ? `<i>${esc(t('from', 'desde'))}</i> ` : ''}${s.price} €</span>
         </button>`).join('')}`).join('');
   }
 
@@ -97,9 +99,9 @@
         </span>
       </button>`;
     return `
-      <p class="bk-hint">¿Con quién quieres la cita?</p>
-      ${opt('any', 'Sin preferencia', 'Te damos el primer hueco libre', '<svg viewBox="0 0 24 24"><path d="M8 12h8M12 8v8"/></svg>')}
-      ${BARBERS.map((b) => opt(b.id, b.name, 'Barbero', b.ini)).join('')}`;
+      <p class="bk-hint">${esc(t('bk.barber.ask', '¿Con quién quieres la cita?'))}</p>
+      ${opt('any', t('bk.barber.any', 'Sin preferencia'), t('bk.barber.anyMeta', 'Te damos el primer hueco libre'), '<svg viewBox="0 0 24 24"><path d="M8 12h8M12 8v8"/></svg>')}
+      ${BARBERS.map((b) => opt(b.id, b.name, C.barberRole(), b.ini)).join('')}`;
   }
 
   // Paso 3 · día y hora (solo se ofrecen huecos donde el barbero está libre toda la duración del servicio)
@@ -117,19 +119,19 @@
       st.slot = null;
     }
     const cur = days.find((d) => d.ymd === st.date);
-    const label = (ymd) => (ymd === now.ymd ? 'Hoy' : ymd === addDays(now.ymd, 1) ? 'Mañana' : fmtDay(ymd, { weekday: 'short' }));
+    const label = (ymd) => (ymd === now.ymd ? t('bk.today', 'Hoy') : ymd === addDays(now.ymd, 1) ? t('bk.tomorrow', 'Mañana') : fmtDay(ymd, { weekday: 'short' }));
 
     const daysHtml = days.map((d) => `
       <button type="button" class="bk-day" data-pick-day="${d.ymd}" aria-pressed="${d.ymd === st.date}" ${d.slots.length ? '' : 'disabled'}
-        aria-label="${esc(longDate(d.ymd))}${d.slots.length ? '' : ', sin huecos'}">
+        aria-label="${esc(longDate(d.ymd))}${d.slots.length ? '' : t('bk.noSlotsDay', ', sin huecos')}">
         <small>${esc(label(d.ymd))}</small>
         <strong>${fmtDay(d.ymd, { day: 'numeric' })}</strong>
         <small>${esc(fmtDay(d.ymd, { month: 'short' }).replace('.', ''))}</small>
       </button>`).join('');
 
-    let slotsHtml = '<p class="bk-empty">No quedan huecos en los próximos días con esta combinación. Prueba con «Sin preferencia».</p>';
+    let slotsHtml = `<p class="bk-empty">${esc(t('bk.noSlots', 'No quedan huecos en los próximos días con esta combinación. Prueba con «Sin preferencia».'))}</p>`;
     if (cur) {
-      const groups = [['Mañana', cur.slots.filter((s) => s.time < 900)], ['Tarde', cur.slots.filter((s) => s.time >= 900)]];
+      const groups = [[t('bk.morning', 'Mañana'), cur.slots.filter((s) => s.time < 900)], [t('bk.afternoon', 'Tarde'), cur.slots.filter((s) => s.time >= 900)]];
       slotsHtml = `<p class="bk-when">${esc(longDate(cur.ymd))} · ${durTxt(st.service.dur)}</p>` + groups.filter(([, l]) => l.length).map(([g, l]) => `
         <h3 class="bk-cat">${g}</h3>
         <div class="bk-slots">${l.map((s) => `
@@ -137,7 +139,7 @@
             aria-pressed="${!!st.slot && st.slot.time === s.time}">${hhmm(s.time)}</button>`).join('')}
         </div>`).join('');
     }
-    return `<div class="bk-days" role="group" aria-label="Elige día">${daysHtml}</div>${slotsHtml}`;
+    return `<div class="bk-days" role="group" aria-label="${esc(t('bk.pickDay', 'Elige día'))}">${daysHtml}</div>${slotsHtml}`;
   }
 
   // Paso 4 · datos + estilo opcional
@@ -146,36 +148,36 @@
     const isCut = /fade|completo|pack/.test(st.service.id);
     const styles = isCut ? `
       <fieldset class="bk-styles">
-        <legend>¿Qué estilo buscas? <span>(opcional)</span></legend>
+        <legend>${esc(t('bk.f.style', '¿Qué estilo buscas?'))} <span>${esc(t('bk.f.optional', '(opcional)'))}</span></legend>
         <div class="bk-styles__row">
           ${STYLES.map((s) => `
             <button type="button" class="bk-style" data-pick-style="${s.id}" aria-pressed="${st.style === s.id}">
-              ${C.styleSvg(s, `bk-${s.id}`)}<span>${esc(s.name)}</span>
+              ${C.styleSvg(s, `bk-${s.id}`)}<span>${esc(C.styleName(s))}</span>
             </button>`).join('')}
         </div>
-        <a class="bk-styles__link" href="#cortes" data-close-to="#cortes">Ver la guía de cortes</a>
+        <a class="bk-styles__link" href="#cortes" data-close-to="#cortes">${esc(t('bk.f.guide', 'Ver la guía de cortes'))}</a>
       </fieldset>` : '';
     return `
       <form class="bk-form" data-form novalidate>
         ${styles}
-        <label>Nombre y apellido
+        <label>${esc(t('bk.f.name', 'Nombre y apellido'))}
           <input name="name" autocomplete="name" required minlength="2" value="${esc(v.name)}">
         </label>
-        <label>Teléfono móvil
+        <label>${esc(t('bk.f.phone', 'Teléfono móvil'))}
           <input name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="600 000 000" value="${esc(v.phone)}">
         </label>
-        <label>Email <span>(opcional, para recibir la confirmación)</span>
+        <label>${esc(t('bk.f.email', 'Email'))} <span>${esc(t('bk.f.emailHint', '(opcional, para recibir la confirmación)'))}</span>
           <input name="email" type="email" autocomplete="email" value="${esc(v.email)}">
         </label>
-        <label>¿Algo que debamos saber? <span>(opcional)</span>
-          <textarea name="notes" rows="2" placeholder="Ej.: degradado bajo, diseño en el lateral…">${esc(v.notes)}</textarea>
+        <label>${esc(t('bk.f.notes', '¿Algo que debamos saber?'))} <span>${esc(t('bk.f.optional', '(opcional)'))}</span>
+          <textarea name="notes" rows="2" placeholder="${esc(t('bk.f.notesPh', 'Ej.: degradado bajo, diseño en el lateral…'))}">${esc(v.notes)}</textarea>
         </label>
         <label class="bk-check">
           <input type="checkbox" name="privacy" required ${v.privacy ? 'checked' : ''}>
-          <span>Acepto que Peluquería Castro use mis datos para gestionar la cita.</span>
+          <span>${esc(t('bk.f.privacy', 'Acepto que Peluquería Castro use mis datos para gestionar la cita.'))}</span>
         </label>
         <p class="bk-error" data-error role="alert"></p>
-        <p class="bk-demo">Demo: no se envía nada. La reserva se guarda solo en este navegador y aparece en el <a href="panel.html" target="_blank">panel del equipo</a>.</p>
+        <p class="bk-demo">${t('bk.demo', 'Demo: no se envía nada. La reserva se guarda solo en este navegador y aparece en el <a href="panel.html" target="_blank">panel del equipo</a>.')}</p>
       </form>`;
   }
 
@@ -187,20 +189,20 @@
     return `
       <div class="bk-done">
         <div class="bk-done__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-        <h3>¡Te esperamos, ${esc(b.name.split(' ')[0])}!</h3>
-        <p>Tu cita está reservada.</p>
+        <h3>${esc(t('bk.done.hello', '¡Te esperamos, {name}!', { name: b.name.split(' ')[0] }))}</h3>
+        <p>${esc(t('bk.done.booked', 'Tu cita está reservada.'))}</p>
         <dl class="bk-ticket">
-          <div><dt>Servicio</dt><dd>${esc(s.name)}${style ? ` · ${esc(style.name)}` : ''}</dd></div>
-          <div><dt>Barbero</dt><dd>${esc(br.name)}</dd></div>
-          <div><dt>Cuándo</dt><dd>${esc(longDate(b.date))}, ${hhmm(b.time)}</dd></div>
-          <div><dt>Precio</dt><dd>${priceTxt(s)} · ${durTxt(s.dur)}</dd></div>
-          <div><dt>Dónde</dt><dd>Calle Clara Campoamor, 1 · Castellón</dd></div>
+          <div><dt>${esc(t('bk.done.service', 'Servicio'))}</dt><dd>${esc(C.svcName(s))}${style ? ` · ${esc(C.styleName(style))}` : ''}</dd></div>
+          <div><dt>${esc(t('bk.done.barber', 'Barbero'))}</dt><dd>${esc(br.name)}</dd></div>
+          <div><dt>${esc(t('bk.done.when', 'Cuándo'))}</dt><dd>${esc(longDate(b.date))}, ${hhmm(b.time)}</dd></div>
+          <div><dt>${esc(t('bk.done.price', 'Precio'))}</dt><dd>${priceTxt(s)} · ${durTxt(s.dur)}</dd></div>
+          <div><dt>${esc(t('bk.done.where', 'Dónde'))}</dt><dd>Calle Clara Campoamor, 1 · Castellón</dd></div>
         </dl>
         <div class="bk-done__ctas">
-          <button type="button" class="btn btn--brass" data-ics>Añadir a mi calendario</button>
-          <button type="button" class="btn btn--ghost" data-close>Volver a la web</button>
+          <button type="button" class="btn btn--brass" data-ics>${esc(t('bk.done.ics', 'Añadir a mi calendario'))}</button>
+          <button type="button" class="btn btn--ghost" data-close>${esc(t('bk.done.back', 'Volver a la web'))}</button>
         </div>
-        <p class="bk-demo">En la versión real recibirías la confirmación y un recordatorio el día antes, con un enlace para cambiar o cancelar.</p>
+        <p class="bk-demo">${esc(t('bk.done.demo', 'En la versión real recibirías la confirmación y un recordatorio el día antes, con un enlace para cambiar o cancelar.'))}</p>
       </div>`;
   }
 
@@ -266,10 +268,10 @@
     const f = $('[data-form]', dlg);
     const digits = v.phone.replace(/[\s.()-]/g, '').replace(/^(\+34|0034)/, '');
     let msg = '';
-    if (v.name.length < 2) msg = 'Escribe tu nombre.';
-    else if (!/^[6789]\d{8}$/.test(digits)) msg = 'Revisa el teléfono: deben ser 9 cifras.';
-    else if (v.email && !f.email.checkValidity()) msg = 'Revisa el email.';
-    else if (!v.privacy) msg = 'Necesitamos tu permiso para gestionar la cita.';
+    if (v.name.length < 2) msg = t('bk.err.name', 'Escribe tu nombre.');
+    else if (!/^[6789]\d{8}$/.test(digits)) msg = t('bk.err.phone', 'Revisa el teléfono: deben ser 9 cifras.');
+    else if (v.email && !f.email.checkValidity()) msg = t('bk.err.email', 'Revisa el email.');
+    else if (!v.privacy) msg = t('bk.err.privacy', 'Necesitamos tu permiso para gestionar la cita.');
     if (msg) { $('[data-error]', dlg).textContent = msg; return; }
 
     // Volver a comprobar que el hueco sigue libre justo antes de guardar
@@ -277,7 +279,7 @@
     if (!C.barberFree(st.slot.barber, st.date, st.slot.time, st.service.dur)) {
       st.slot = null;
       go(2);
-      body.insertAdjacentHTML('afterbegin', '<p class="bk-error">Ese hueco se acaba de ocupar. Elige otra hora.</p>');
+      body.insertAdjacentHTML('afterbegin', `<p class="bk-error">${esc(t('bk.err.taken', 'Ese hueco se acaba de ocupar. Elige otra hora.'))}</p>`);
       return;
     }
     const booking = {
@@ -301,10 +303,10 @@
       `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').slice(0, 15)}Z`,
       `DTSTART;TZID=Europe/Madrid:${stamp(b.date, b.time)}`,
       `DTEND;TZID=Europe/Madrid:${stamp(b.date, b.time + b.dur)}`,
-      `SUMMARY:${s.name} · Peluquería Castro`,
-      `DESCRIPTION:Con ${br.name}. Tel. 667 00 57 50`,
+      `SUMMARY:${C.svcName(s)} · Peluquería Castro`,
+      `DESCRIPTION:${t('ics.desc', 'Con {barber}. Tel. 667 00 57 50', { barber: br.name })}`,
       'LOCATION:Calle Clara Campoamor\\, 1\\, 12003 Castellón de la Plana',
-      'BEGIN:VALARM', 'TRIGGER:-PT2H', 'ACTION:DISPLAY', 'DESCRIPTION:Cita en Peluquería Castro', 'END:VALARM',
+      'BEGIN:VALARM', 'TRIGGER:-PT2H', 'ACTION:DISPLAY', `DESCRIPTION:${t('ics.alarm', 'Cita en Peluquería Castro')}`, 'END:VALARM',
       'END:VEVENT', 'END:VCALENDAR',
     ].join('\r\n');
     const a = document.createElement('a');
@@ -328,6 +330,9 @@
     if (location.hash === '#reservar') history.replaceState(null, '', location.pathname + location.search);
   });
   window.addEventListener('popstate', () => { if (location.hash !== '#reservar') close(); });
+
+  // Cambio de idioma: textos fijos del diálogo y vista actual
+  window.addEventListener('castro:lang', () => { if (dlg.open) render(); });
 
   // Si en otra pestaña (o en el panel) cambian las reservas, refrescar los huecos al momento
   window.addEventListener('storage', (e) => {
