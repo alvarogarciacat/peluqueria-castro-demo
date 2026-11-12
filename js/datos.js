@@ -173,6 +173,8 @@ window.Castro = (() => {
     const id = (k) => `${k}-${uid}`;
     const { top, bottom } = style;
     const mark = style.buzz ? 40 : top; // altura de la línea: en el rapado, arriba del todo (coronilla)
+    // La línea sobresale lo mismo por delante de la cara que por detrás de la nuca (bordes medidos en la lámina a esa altura)
+    const [mx1, mx2] = { taper: [4, 374], low: [26, 388], mid: [30, 384], high: [40, 373], buzz: [101, 322] }[style.id] || [30, 384];
     const line = (d, w) => `<path d="${d}" style="fill:none;stroke:var(--fg, #ede6da);stroke-width:${w};stroke-linecap:round;stroke-linejoin:round"/>`;
     const hair = style.buzz ? `<rect width="420" height="340" fill="url(#${id('g')})"/>`
       : `<rect width="420" height="${top}" style="fill:var(--hair, #c8a46a)"/><rect y="${top - 1}" width="420" height="${bottom - top + 1}" fill="url(#${id('g')})"/>`;
@@ -190,9 +192,9 @@ window.Castro = (() => {
       <path d="${LT.SIL}" style="fill:var(--skin, #26221e)" mask="url(#${id('m')})"/>
       <g clip-path="url(#${id('h')})"><g clip-path="url(#${id('z')})">${hair}</g></g>
       ${line(LT.SKULL, 2.6)}${line(LT.FACE, 2.6)}${line(LT.JAW, 2.4)}${line(LT.THROAT, 2.2)}${line(LT.EAR, 2.8)}${line(LT.BROW, 2.6)}
-      <line class="cut-mark" x1="130" x2="396" y1="${mark}" y2="${mark}" style="stroke:var(--fg, #ede6da);stroke-width:3;stroke-dasharray:12 9" opacity=".85"/>
+      <line class="cut-mark" x1="${mx1}" x2="${mx2}" y1="${mark}" y2="${mark}" style="stroke:var(--fg, #ede6da);stroke-width:3;stroke-dasharray:12 9;transform-origin:${mx2}px 0" opacity=".85"/>
       <g aria-hidden="true">
-        <g class="cut-clip" style="--b:${style.buzz ? 300 : bottom}px;--t:${mark}px">
+        <g class="cut-clip" style="--b:${style.buzz ? 300 : bottom}px;--t:${mark}px;--x0:${mx2 + 9}px;--x1:${mx1 + 9}px">
           <rect y="-12" width="52" height="24" rx="9" style="fill:var(--fg, #ede6da)"/>
           <rect x="-9" y="-14" width="12" height="28" rx="3.5" style="fill:var(--hair, #c8a46a)"/>
         </g>
