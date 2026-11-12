@@ -48,16 +48,17 @@
   }
 
   function stats(barberIds, days, data) {
-    let web = 0, total = 0, free = 0;
+    let web = 0, appts = 0, total = 0, free = 0;
     for (const ymd of days) for (const id of barberIds) {
       for (const s of segments(id, ymd, data)) {
         if (s.type === 'break') continue;
         total += s.to - s.from;
         if (s.type === 'free') free += s.to - s.from;
         if (s.type === 'booking') web++;
+        if (s.type === 'booking' || s.type === 'sim') appts++;
       }
     }
-    return { web, total, free, occ: total ? Math.round(((total - free) / total) * 100) : 0 };
+    return { web, appts, total, free, occ: total ? Math.round(((total - free) / total) * 100) : 0 };
   }
 
   const ids = () => (barber === 'all' ? BARBERS.map((b) => b.id) : [barber]);
@@ -99,6 +100,7 @@
     const st = stats(ids(), days.filter((d) => HOURS[dow(d)].length), data);
     const per = { day: 'hoy', week: 'esta semana', month: 'este mes' }[view];
     $('[data-stats]').innerHTML = `
+      <div><dt>Citas</dt><dd>${st.appts}</dd></div>
       <div><dt>Reservas web</dt><dd>${st.web}</dd></div>
       <div><dt>Ocupación</dt><dd>${st.occ}%</dd></div>
       <div><dt>Tiempo libre</dt><dd>${st.free ? durTxt(st.free) : '—'}</dd></div>`;
@@ -128,7 +130,6 @@
         return `<li class="${cls}">${time}<div class="p-body"><span class="p-tag">Libre · ${durTxt(s.to - s.from)}</span>
           ${past ? '' : `<button type="button" class="p-btn" data-block="${s.from}-${s.to}">Bloquear</button>`}</div></li>`;
       }
-      if (s.type === 'sim') return `<li class="${cls}">${time}<div class="p-body"><span class="p-tag">Cita (ejemplo)</span></div></li>`;
       if (s.type === 'block') {
         return `<li class="${cls}">${time}<div class="p-body"><span class="p-tag">Bloqueado${s.item.reason ? ` · ${esc(s.item.reason)}` : ''}</span>
           <button type="button" class="p-btn" data-unblock="${s.item.id}">Desbloquear</button></div></li>`;
@@ -140,14 +141,14 @@
         <div class="p-booking">
           <p class="p-svc">${esc(sv.name)} <span>· ${durTxt(b.dur)} · ${sv.from ? 'desde ' : ''}${sv.price} €</span></p>
           <p class="p-client">${esc(b.name)}</p>
-          <p class="p-contact">
+          ${b.phone ? `<p class="p-contact">
             <a href="tel:+34${esc(b.phone)}">${esc(b.phone.replace(/(\d{3})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4'))}</a>
             <a href="https://wa.me/34${esc(b.phone)}" target="_blank" rel="noopener">WhatsApp</a>
-          </p>
+          </p>` : ''}
           ${sty ? `<p class="p-style">${C.styleSvg(sty, `p-${b.id}`)}<span>${esc(sty.name)}</span></p>` : ''}
           ${b.notes ? `<p class="p-notes">«${esc(b.notes)}»</p>` : ''}
         </div>
-        <button type="button" class="p-btn p-btn--danger" data-cancel="${b.id}">Cancelar</button>
+        ${s.type === 'booking' ? `<button type="button" class="p-btn p-btn--danger" data-cancel="${b.id}">Cancelar</button>` : ''}
       </div></li>`;
     }).join('')}</ol>`;
   }
@@ -182,12 +183,15 @@
         const blocks = segments(id, c.ymd, data).filter((s) => ['booking', 'sim', 'block'].includes(s.type)).map((s) => {
           const h = ((s.to - s.from) / (END - START)) * 100;
           let txt = '';
-          if (s.type === 'booking') {
+          if (s.type === 'booking' || s.type === 'sim') {
             const sv = SERVICES.find((x) => x.id === s.item.service);
-            txt = n > 1 ? esc(bName(id).ini) : `<b>${hhmm(s.from)}</b> ${esc(s.item.name)}<br><span>${esc(sv ? sv.name : '')}</span>`;
+            const short = s.to - s.from <= STEP; // 15 min: una sola línea para que no se corte
+            txt = n > 1 ? esc(bName(id).ini) : short
+              ? `<b>${hhmm(s.from)}</b> ${esc(s.item.name)} <span>· ${esc(sv ? sv.name : '')}</span>`
+              : `<b>${hhmm(s.from)}</b> ${esc(s.item.name)}<br><span>${esc(sv ? sv.name : '')}</span>`;
           } else if (s.type === 'block') txt = n > 1 ? '' : 'Bloqueado';
-          const go = s.type === 'booking' ? ` data-go-day="${c.ymd}" data-go-barber="${id}"` : '';
-          return `<div class="cal-ev cal-ev--${s.type}" style="top:${pct(s.from)};height:${h}%"${go} title="${hhmm(s.from)}–${hhmm(s.to)} · ${esc(bName(id).short)}">${txt}</div>`;
+          const go = s.type === 'booking' || s.type === 'sim' ? ` data-go-day="${c.ymd}" data-go-barber="${id}"` : '';
+          return `<div class="cal-ev cal-ev--${s.type}${n === 1 && s.to - s.from <= STEP ? ' cal-ev--short' : ''}" style="top:${pct(s.from)};height:${h}%"${go} title="${hhmm(s.from)}–${hhmm(s.to)} · ${esc(bName(id).short)}${s.item && s.item.name ? ` · ${esc(s.item.name)}` : ''}">${txt}</div>`;
         }).join('');
         return `<div class="cal-lane" style="left:${(i / n) * 100}%;width:${100 / n}%">${blocks}</div>`;
       }).join('');
@@ -196,7 +200,8 @@
       return `<div class="cal-col">${head}<div class="cal-body">${hours.map((m) => `<i class="cal-line" style="top:${pct(m)}"></i>`).join('')}${closed}${lanes}${nowLine}</div></div>`;
     }).join('');
     const wide = cols.length > 3 && cols[0].lanes.length > 1 ? ' cal--wide' : '';
-    return `<div class="cal${wide}" style="--cols:${cols.length}"><div class="cal-scroll"><div class="cal-grid"><div class="cal-axis-wrap"><div class="cal-head cal-head--empty"></div>${axis}</div>${colsHtml}</div></div></div>`;
+    const size = cols[0].head === 'barber' ? ' cal--day' : ' cal--week';
+    return `<div class="cal${wide}${size}" style="--cols:${cols.length}"><div class="cal-scroll"><div class="cal-grid"><div class="cal-axis-wrap"><div class="cal-head cal-head--empty"></div>${axis}</div>${colsHtml}</div></div></div>`;
   }
 
   // Mes
@@ -215,10 +220,10 @@
       const level = st ? (st.occ >= 75 ? 'high' : st.occ >= 45 ? 'mid' : 'low') : '';
       cells.push(`
         <button type="button" class="m-day${out ? ' is-out' : ''}${ymd === now.ymd ? ' is-today' : ''}${open ? '' : ' is-closed'}" data-go-day="${ymd}"
-          aria-label="${esc(longDate(ymd))}${st ? `, ocupación ${st.occ}%, ${st.web} reservas web` : ', cerrado'}">
+          aria-label="${esc(longDate(ymd))}${st ? `, ${st.appts} citas, ocupación ${st.occ}%` : ', cerrado'}">
           <span class="m-num">${fmtDay(ymd, { day: 'numeric' })}</span>
           ${st ? `<span class="m-bar m-bar--${level}"><i style="width:${st.occ}%"></i></span>
-                  <span class="m-occ">${st.occ}%</span>
+                  <span class="m-occ">${st.appts} citas · ${st.occ}%</span>
                   ${st.web ? `<span class="m-web">${st.web} web</span>` : ''}` : '<span class="m-closed">Cerrado</span>'}
         </button>`);
     }

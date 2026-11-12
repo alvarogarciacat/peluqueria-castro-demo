@@ -1,5 +1,5 @@
 // Peluquería Castro · datos y lógica de disponibilidad compartidos por la web y el panel.
-// DEMO: las citas "de ejemplo" se simulan y las reservas/bloqueos se guardan en localStorage.
+// DEMO: las citas "de ejemplo" (clientes inventados) se generan y las reservas/bloqueos se guardan en localStorage.
 // En la versión real, load()/save() y la simulación se sustituyen por llamadas al servidor.
 window.Castro = (() => {
   // Servicios, precios y duraciones tal cual están en su web de Square (solo se corrigen erratas)
@@ -79,20 +79,64 @@ window.Castro = (() => {
     return ((h >>> 0) % 10000) / 10000;
   }
 
+  // ---------- agenda de ejemplo: clientes y servicios inventados ----------
+  // Determinista (mismo día y barbero = misma agenda). Cada día tiene su carga: unos tranquilos y otros llenos.
+  const SIM_MIX = [['fade', 30], ['fade-diseno', 10], ['pack-barba', 12], ['completo', 8], ['pack-cejas', 8], ['fade-hilo', 5],
+    ['tinte', 7], ['mechas', 4], ['permanente', 2], ['decoloracion', 2], ['cejas', 5], ['hilo', 3]];
+  const SIM_FIRST = ['Álex', 'Marc', 'Pau', 'Joan', 'Vicent', 'Hugo', 'Daniel', 'Adrián', 'Sergio', 'Pablo', 'Iván', 'Raúl', 'Jorge', 'Carlos',
+    'Nacho', 'Lucas', 'Mateo', 'Rubén', 'Aitor', 'Enzo', 'Biel', 'Samir', 'Andrei', 'Bogdan', 'Yassine', 'Tomás', 'Gonzalo', 'Álvaro', 'Javi',
+    'Miguel', 'David', 'Víctor', 'Óscar', 'Eric', 'Nil', 'Jaume', 'Toni', 'Fran', 'Leo', 'Izan', 'Oriol', 'Rafa', 'Santi', 'Manu', 'Gabri', 'Edu',
+    'María', 'Laura', 'Carla', 'Lucía', 'Marta', 'Sara', 'Paula', 'Noa', 'Aina', 'Júlia', 'Elena', 'Irene'];
+  const SIM_LAST = ['García', 'Martínez', 'López', 'Sánchez', 'Pérez', 'Gómez', 'Ruiz', 'Fernández', 'Moreno', 'Navarro', 'Ferrer', 'Soler', 'Safont',
+    'Gil', 'Blasco', 'Climent', 'Mas', 'Vilar', 'Roca', 'Bellver', 'Edo', 'Sales', 'Tormo', 'Beltrán', 'Giner', 'Nebot', 'Pitarch', 'Segarra',
+    'Querol', 'Font', 'Ibáñez', 'Rubio', 'Marín', 'Vidal', 'Ortega', 'Serrano', 'Cano', 'Prieto', 'Mora', 'Peña'];
+  const SIM_NOTES = ['Trae foto de referencia', 'Primera visita', 'Cliente habitual', 'Viene con su hijo', 'Quiere los laterales más cortos',
+    'Prefiere máquina del 1', 'Pide hora para una boda', 'Cambio de look', 'Llegará 5 min tarde', 'Le gusta el flequillo largo'];
+  const simPick = (list, r) => list[Math.min(list.length - 1, Math.floor(r * list.length))];
+  const simCache = new Map();
+
+  function simAppts(barberId, ymd) {
+    const key = `${barberId}|${ymd}`;
+    if (simCache.has(key)) return simCache.get(key);
+    const out = [];
+    const skip = 0.3 + 0.45 * rnd(`${key}|carga`); // probabilidad de dejar libre el siguiente tramo de 30 min
+    const total = SIM_MIX.reduce((n, [, w]) => n + w, 0);
+    for (const [a, b] of HOURS[dow(ymd)]) {
+      let t = a + Math.floor(rnd(`${key}|${a}|ini`) * 3) * STEP;
+      while (t < b) {
+        if (rnd(`${key}|${t}|libre`) < skip) { t += 30; continue; }
+        let r = rnd(`${key}|${t}|svc`) * total;
+        let svc = SERVICES.find((x) => x.id === SIM_MIX[0][0]);
+        for (const [id, w] of SIM_MIX) { r -= w; if (r < 0) { svc = SERVICES.find((x) => x.id === id); break; } }
+        if (t + svc.dur > b) svc = SERVICES.find((x) => x.id === 'cejas');   // lo que cabe antes de cerrar
+        if (t + svc.dur > b) break;
+        const name = `${simPick(SIM_FIRST, rnd(`${key}|${t}|n`))} ${simPick(SIM_LAST, rnd(`${key}|${t}|a`))}`;
+        const isCut = /fade|completo|pack/.test(svc.id);
+        out.push({
+          id: `s${barberId}${ymd.replace(/-/g, '')}${t}`, sim: true, barber: barberId, date: ymd, time: t, dur: svc.dur, service: svc.id, name,
+          style: isCut && rnd(`${key}|${t}|est`) < 0.45 ? simPick(STYLES, rnd(`${key}|${t}|e2`)).id : null,
+          notes: rnd(`${key}|${t}|nota`) < 0.2 ? simPick(SIM_NOTES, rnd(`${key}|${t}|n2`)) : '',
+        });
+        t += Math.ceil(svc.dur / STEP) * STEP + (rnd(`${key}|${t}|pausa`) < 0.5 ? 0 : STEP);
+      }
+    }
+    simCache.set(key, out);
+    return out;
+  }
+
   // ---------- almacenamiento (demo) ----------
   const load = (key) => { try { return JSON.parse(localStorage.getItem(KEYS[key])) || []; } catch { return []; } };
   const save = (key, list) => { try { localStorage.setItem(KEYS[key], JSON.stringify(list)); } catch { /* sin almacenamiento */ } };
 
   // ---------- disponibilidad ----------
-  const simBusy = (barberId, ymd, m) => rnd(`${ymd}|${barberId}|${Math.floor(m / 30)}`) < 0.28;
-
   // Motivo por el que el bloque de 15 min que empieza en `m` está ocupado (o null si está libre)
   function busyReason(barberId, ymd, m, data) {
     const b = data.bookings.find((x) => x.barber === barberId && x.date === ymd && m >= x.time && m < x.time + x.dur);
     if (b) return { type: 'booking', item: b };
     const k = data.blocks.find((x) => x.barber === barberId && x.date === ymd && m >= x.from && m < x.to);
     if (k) return { type: 'block', item: k };
-    if (simBusy(barberId, ymd, m)) return { type: 'sim' };
+    const sim = simAppts(barberId, ymd).find((x) => m >= x.time && m < x.time + x.dur);
+    if (sim) return { type: 'sim', item: sim };
     return null;
   }
   const snapshot = () => ({ bookings: load('bookings'), blocks: load('blocks') });
@@ -146,6 +190,6 @@ window.Castro = (() => {
     SERVICES, BARBERS, STYLES, HOURS, STEP, KEYS,
     tr, tf, catKey, catName, svcName, svcNote, styleName, styleDesc, barberRole,
     esc, hhmm, durTxt, priceTxt, madridNow, addDays, dow, fmtDay, longDate, rnd,
-    load, save, snapshot, busyReason, barberFree, slotsFor, styleSvg,
+    simAppts, load, save, snapshot, busyReason, barberFree, slotsFor, styleSvg,
   };
 })();

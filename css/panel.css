@@ -35,20 +35,20 @@
 .p-pick input:focus { outline: none; }
 .p-pick:focus-within { border-color: var(--accent); }
 
-.p-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 20px; }
+.p-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 0 20px; }
 .p-stats div { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
 .p-stats dt { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .p-stats dd { margin: 2px 0 0; font-family: var(--display); font-weight: var(--d-weight); font-size: calc(26px * var(--ds)); line-height: 1.1; color: var(--accent-hi); }
 
 /* ---------- Vista día (lista) ---------- */
-.p-agenda { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 760px; }
-.p-item { display: grid; grid-template-columns: 58px 1fr; gap: 12px; align-items: stretch; }
+.p-agenda { list-style: none; margin: 0 auto; padding: 0; display: grid; gap: 10px; max-width: 820px; }
+.p-item { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: stretch; }
 .p-time { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; padding-top: 12px; display: flex; flex-direction: column; }
 .p-time small { font-weight: 400; color: var(--muted); font-size: 12px; }
 .p-body { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 8px; padding: 12px 14px; border: 1px solid var(--line); min-height: 52px; }
 .p-tag { font-size: 13px; font-weight: 600; }
 .p-item--free .p-body { border-style: dashed; color: var(--ok); }
-.p-item--sim .p-body { background: var(--surface-2); color: var(--muted); }
+.p-item--sim .p-body { align-items: flex-start; background: var(--surface-2); border-left: 3px solid var(--line-strong); color: var(--fg-soft); }
 .p-item--break .p-body { border: 0; min-height: 0; padding: 4px 14px; color: var(--muted); }
 .p-item--break .p-time { padding-top: 4px; color: var(--muted); }
 .p-item--block .p-body { color: var(--warn); background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--warn) 10%, transparent) 0 6px, transparent 6px 12px); border-color: color-mix(in srgb, var(--warn) 40%, transparent); }
@@ -69,6 +69,8 @@
 
 /* ---------- Calendario por horas (semana / día con todos) ---------- */
 .cal { --h: 640px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.cal--day { --h: 980px; }
+.cal--week { --h: 780px; }
 .cal-scroll { overflow-x: auto; }
 .cal-grid { display: grid; grid-template-columns: 52px repeat(var(--cols), minmax(92px, 1fr)); min-width: calc(52px + var(--cols) * 92px); }
 .cal--wide .cal-grid { grid-template-columns: 52px repeat(var(--cols), minmax(120px, 1fr)); min-width: calc(52px + var(--cols) * 120px); }
@@ -98,7 +100,11 @@
 .cal-ev--booking { background: var(--accent); color: var(--on-accent); cursor: pointer; box-shadow: 0 1px 0 color-mix(in srgb, var(--bg) 60%, transparent); }
 .cal-ev--booking span { opacity: .85; }
 .cal-ev--booking:hover { filter: brightness(1.08); }
-.cal-ev--sim { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+.cal-ev--sim { background: var(--surface-2); color: var(--fg-soft); border: 1px solid var(--line); border-left: 3px solid var(--line-strong); }
+.cal-ev--sim b { color: var(--fg); }
+.cal-ev--sim span { color: var(--muted); }
+.cal--day .cal-ev { font-size: 12px; padding: 4px 8px; white-space: nowrap; text-overflow: ellipsis; }
+.cal-ev--short { white-space: nowrap; text-overflow: ellipsis; padding-top: 1px; padding-bottom: 1px; }
 .cal-ev--block { color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent); background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--warn) 14%, transparent) 0 5px, transparent 5px 10px); }
 .cal-now { position: absolute; left: 0; right: 0; height: 2px; background: #ff4d4d; z-index: 2; }
 .cal-now::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: #ff4d4d; }
@@ -145,8 +151,12 @@
   .p-date { grid-template-columns: 1fr auto; }
   .p-date__label { grid-column: 1 / -1; grid-row: 1; text-align: left; }
   .p-pick span { display: none; }
+  .p-stats { grid-template-columns: repeat(2, 1fr); }
   .p-stats dd { font-size: calc(22px * var(--ds)); }
   .cal { --h: 560px; }
+  .cal--day { --h: 900px; }
+  .cal--week { --h: 700px; }
+  .p-item { grid-template-columns: 52px 1fr; gap: 10px; }
   .m-day { min-height: 64px; padding: 5px; }
   .m-occ { display: none; }
   .m-num { font-size: 15px; }
