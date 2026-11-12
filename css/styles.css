@@ -723,6 +723,10 @@ html:has(.booking[open]), html:has(.aj[open]) { overflow: hidden; }
 .aj-title { margin: 0; font-weight: 700; font-size: 18px; }
 .aj-sub { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
 .aj-body { flex: 1; overflow-y: auto; padding: 6px 20px 28px; overscroll-behavior: contain; }
+/* Ajustes sin barras de scroll: el panel se sigue desplazando con la rueda o el dedo, y la página de detrás no se mueve */
+.aj-body { scrollbar-width: none; }
+.aj-body::-webkit-scrollbar { display: none; }
+html:has(dialog.aj[open]) { overflow: hidden; }
 .aj-h { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 22px 0 10px; }
 .aj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .aj-grid--presets { grid-template-columns: 1fr; }
