@@ -389,8 +389,8 @@ html[data-fotos="luminosa"] .hero__bg img { object-position: 50% 50%; }
 .cut-svg { width: 84%; height: auto; overflow: visible; }
 /* Maquinilla: sube por el degradado al aparecer la tarjeta y al pasar el ratón */
 .cut-clip { opacity: 0; transform: translateY(var(--b)); }
-.cut.is-in .cut-clip { animation: clip-pass 1.8s var(--ease) calc(.35s + var(--i, 0) * .15s) both; }
-.cut:hover .cut-clip { animation: clip-pass-2 1.5s var(--ease) both; }
+.cut.is-in .cut-clip { animation: clip-pass 3s ease-in-out calc(.35s + var(--i, 0) * .2s) both; }
+.cut:hover .cut-clip { animation: clip-pass-2 2.6s ease-in-out both; }
 .cut:nth-child(2) { --i: 1; } .cut:nth-child(3) { --i: 2; } .cut:nth-child(4) { --i: 3; } .cut:nth-child(5) { --i: 4; }
 @keyframes clip-pass {
   0% { opacity: 0; transform: translateY(var(--b)); }
@@ -406,8 +406,8 @@ html[data-fotos="luminosa"] .hero__bg img { object-position: 50% 50%; }
 }
 /* Línea discontinua: altura a la que empieza el degradado. Se dibuja cuando la maquinilla llega arriba */
 .cut-mark { transform-origin: 396px 0; }
-.cut.is-in .cut-mark { animation: mark-in .6s var(--ease) calc(1.4s + var(--i, 0) * .15s) both; }
-.cut:hover .cut-mark { animation: mark-in-2 .5s var(--ease) 1.1s both; }
+.cut.is-in .cut-mark { animation: mark-in .9s var(--ease) calc(2.6s + var(--i, 0) * .2s) both; }
+.cut:hover .cut-mark { animation: mark-in-2 .8s var(--ease) 1.95s both; }
 @keyframes mark-in { from { transform: scaleX(0); opacity: 0; } }
 @keyframes mark-in-2 { from { transform: scaleX(0); opacity: 0; } }
 .bk-style .cut-clip, .p-style .cut-clip, .bk-style .cut-mark, .p-style .cut-mark { display: none; }
