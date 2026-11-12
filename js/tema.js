@@ -115,44 +115,68 @@
     });
   }
 
+  // Textos del panel: traducidos si la página carga js/i18n.js (la web); el panel del equipo sigue en español
+  const T = (key, fb) => (window.I18N ? window.I18N.tr(key, fb) : fb);
+  const chip = (k, v, inner, cls = '') => `<button type="button" class="aj-opt ${cls}" data-k="${k}" data-v="${v}" aria-pressed="false">${inner}</button>`;
+  const sw = (c) => `<span class="aj-sw">${c.map((x) => `<i style="background:${x}"></i>`).join('')}</span>`;
+  const aa = (t) => `<span class="aj-aa" style="font-family:${t.family};${t.style || ''}">Aa</span>`;
+  const FAB_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.6-1.2-.6-2 0-.9.7-1.4 1.6-1.4H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="14.5" cy="7" r="1.2"/></svg>';
+
+  function panelHtml() {
+    const L = window.I18N;
+    const idioma = L ? `
+        <h3 class="aj-h">${T('aj.lang', 'Idioma')}</h3>
+        <div class="aj-grid">${Object.entries(L.LANGS).map(([id, l]) => chip('lang', id, `<span class="aj-aa" style="font-size:16px;font-weight:700">${l.short}</span><span class="aj-name">${l.name}</span>`)).join('')}</div>` : '';
+    return `
+      <div class="aj-head">
+        <div><p class="aj-title">${T('aj.title', 'Ajustes de la demo')}</p><p class="aj-sub">${T('aj.sub', 'Prueba combinaciones. Esto no aparecerá en la web final.')}</p></div>
+        <button type="button" class="aj-x" data-aj-close aria-label="${T('bk.close', 'Cerrar')}"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="aj-body">${idioma}
+        <h3 class="aj-h">${T('aj.presets', 'Combinaciones listas')}</h3>
+        <div class="aj-grid aj-grid--presets">
+          ${Object.entries(PRESETS).map(([id, p]) => chip('preset', id, `
+            ${sw(COLORES[p.color].sw)}${aa(TIPOS[p.tipo])}
+            <span class="aj-name">${T(`aj.preset.${id}`, p.name)}</span><span class="aj-desc">${T(`aj.preset.${id}.d`, p.desc)}</span>`, 'aj-opt--preset')).join('')}
+        </div>
+        <h3 class="aj-h">${T('aj.colors', 'Colores')}</h3>
+        <div class="aj-grid">${Object.entries(COLORES).map(([id, c]) => chip('color', id, `${sw(c.sw)}<span class="aj-name">${T(`aj.color.${id}`, c.name)}</span><span class="aj-desc">${T(`aj.color.${id}.d`, c.desc)}</span>`)).join('')}</div>
+        <h3 class="aj-h">${T('aj.type', 'Tipografía')}</h3>
+        <div class="aj-grid">${Object.entries(TIPOS).map(([id, t]) => chip('tipo', id, `${aa(t)}<span class="aj-name">${T(`aj.tipo.${id}`, t.name)}</span><span class="aj-desc">${t.desc}</span>`)).join('')}</div>
+        <h3 class="aj-h">${T('aj.photos', 'Fotos')}</h3>
+        <div class="aj-grid aj-grid--fotos">${Object.entries(FOTOS).map(([id, f]) => chip('fotos', id, `<img src="${f.src('g1')}" alt="" loading="lazy"><span class="aj-name">${T(`aj.foto.${id}`, f.name)}</span><span class="aj-desc">${T(`aj.foto.${id}.d`, f.desc)}</span>`)).join('')}</div>
+        <button type="button" class="aj-reset" data-aj-reset>${T('aj.reset', 'Volver a la original')}</button>
+      </div>`;
+  }
+
+  let fab = null;
+  function labels() {
+    fab.innerHTML = `${FAB_ICON}<span>${T('aj.fab', 'Ajustes')}</span>`;
+    fab.setAttribute('aria-label', T('aj.fabAria', 'Ajustes de la demo: colores, tipografía y fotos'));
+    ui.setAttribute('aria-label', T('aj.title', 'Ajustes de la demo'));
+  }
+  // Al cambiar de idioma se redibuja el panel (conservando el scroll) y se vuelven a marcar las opciones activas
+  function refreshUi() {
+    if (!ui) return;
+    const body = ui.querySelector('.aj-body');
+    const y = body ? body.scrollTop : 0;
+    ui.innerHTML = panelHtml();
+    labels();
+    syncUi();
+    const nb = ui.querySelector('.aj-body');
+    if (nb) nb.scrollTop = y;
+  }
+
   function buildUi() {
     if (document.body.dataset.noAjustes !== undefined) return;
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'aj-fab';
-    btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.6-1.2-.6-2 0-.9.7-1.4 1.6-1.4H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="14.5" cy="7" r="1.2"/></svg><span>Ajustes</span>';
-    btn.setAttribute('aria-label', 'Ajustes de la demo: colores, tipografía y fotos');
-
+    fab = btn;
     ui = document.createElement('dialog');
     ui.className = 'aj';
-    ui.setAttribute('aria-label', 'Ajustes de la demo');
-    const chip = (k, v, inner, cls = '') => `<button type="button" class="aj-opt ${cls}" data-k="${k}" data-v="${v}" aria-pressed="false">${inner}</button>`;
-    const sw = (c) => `<span class="aj-sw">${c.map((x) => `<i style="background:${x}"></i>`).join('')}</span>`;
-    const aa = (t) => `<span class="aj-aa" style="font-family:${t.family};${t.style || ''}">Aa</span>`;
-    const L = window.I18N; // solo en las páginas que cargan js/i18n.js (la web; el panel del equipo sigue en español)
-    const idioma = L ? `
-        <h3 class="aj-h">Idioma</h3>
-        <div class="aj-grid">${Object.entries(L.LANGS).map(([id, l]) => chip('lang', id, `<span class="aj-aa" style="font-size:16px;font-weight:700">${l.short}</span><span class="aj-name">${l.name}</span>`)).join('')}</div>` : '';
-    ui.innerHTML = `
-      <div class="aj-head">
-        <div><p class="aj-title">Ajustes de la demo</p><p class="aj-sub">Prueba combinaciones. Esto no aparecerá en la web final.</p></div>
-        <button type="button" class="aj-x" data-aj-close aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-      </div>
-      <div class="aj-body">${idioma}
-        <h3 class="aj-h">Combinaciones listas</h3>
-        <div class="aj-grid aj-grid--presets">
-          ${Object.entries(PRESETS).map(([id, p]) => chip('preset', id, `
-            ${sw(COLORES[p.color].sw)}${aa(TIPOS[p.tipo])}
-            <span class="aj-name">${p.name}</span><span class="aj-desc">${p.desc}</span>`, 'aj-opt--preset')).join('')}
-        </div>
-        <h3 class="aj-h">Colores</h3>
-        <div class="aj-grid">${Object.entries(COLORES).map(([id, c]) => chip('color', id, `${sw(c.sw)}<span class="aj-name">${c.name}</span><span class="aj-desc">${c.desc}</span>`)).join('')}</div>
-        <h3 class="aj-h">Tipografía</h3>
-        <div class="aj-grid">${Object.entries(TIPOS).map(([id, t]) => chip('tipo', id, `${aa(t)}<span class="aj-name">${t.name}</span><span class="aj-desc">${t.desc}</span>`)).join('')}</div>
-        <h3 class="aj-h">Fotos</h3>
-        <div class="aj-grid aj-grid--fotos">${Object.entries(FOTOS).map(([id, f]) => chip('fotos', id, `<img src="${f.src('g1')}" alt="" loading="lazy"><span class="aj-name">${f.name}</span><span class="aj-desc">${f.desc}</span>`)).join('')}</div>
-        <button type="button" class="aj-reset" data-aj-reset>Volver a la original</button>
-      </div>`;
+    ui.innerHTML = panelHtml();
+    labels();
     document.body.append(btn, ui);
 
     btn.addEventListener('click', () => {
@@ -173,7 +197,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => { applyPhotos(); buildUi(); });
-  window.addEventListener('castro:lang', syncUi);
+  window.addEventListener('castro:lang', refreshUi);
   // Si se cambia el tema en otra pestaña (p. ej. web y panel abiertos a la vez)
   window.addEventListener('storage', (e) => {
     if (e.key === STORE && !fromUrl) { cur = { ...DEFAULT, ...read() }; apply(); }
