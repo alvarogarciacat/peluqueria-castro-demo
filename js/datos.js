@@ -190,8 +190,8 @@ window.Castro = (() => {
       <g clip-path="url(#${id('h')})"><g clip-path="url(#${id('z')})">${hair}</g></g>
       ${line(LT.SKULL, 2.6)}${line(LT.FACE, 2.6)}${line(LT.JAW, 2.4)}${line(LT.THROAT, 2.2)}${line(LT.EAR, 2.8)}${line(LT.BROW, 2.6)}
       ${style.buzz ? '' : `<line class="cut-mark" x1="130" x2="396" y1="${top}" y2="${top}" style="stroke:var(--fg, #ede6da);stroke-width:3;stroke-dasharray:12 9" opacity=".85"/>`}
-      <g transform="translate(370 0)" aria-hidden="true">
-        <g class="cut-clip" style="--b:${bottom}px;--t:${top}px">
+      <g transform="translate(0 ${style.buzz ? 170 : top})" aria-hidden="true">
+        <g class="cut-clip">
           <rect y="-12" width="52" height="24" rx="9" style="fill:var(--fg, #ede6da)"/>
           <rect x="-9" y="-14" width="12" height="28" rx="3.5" style="fill:var(--hair, #c8a46a)"/>
         </g>
