@@ -172,6 +172,7 @@ window.Castro = (() => {
   function styleSvg(style, uid = style.id) {
     const id = (k) => `${k}-${uid}`;
     const { top, bottom } = style;
+    const mark = style.buzz ? 40 : top; // altura de la línea: en el rapado, arriba del todo (coronilla)
     const line = (d, w) => `<path d="${d}" style="fill:none;stroke:var(--fg, #ede6da);stroke-width:${w};stroke-linecap:round;stroke-linejoin:round"/>`;
     const hair = style.buzz ? `<rect width="420" height="340" fill="url(#${id('g')})"/>`
       : `<rect width="420" height="${top}" style="fill:var(--hair, #c8a46a)"/><rect y="${top - 1}" width="420" height="${bottom - top + 1}" fill="url(#${id('g')})"/>`;
@@ -189,9 +190,9 @@ window.Castro = (() => {
       <path d="${LT.SIL}" style="fill:var(--skin, #26221e)" mask="url(#${id('m')})"/>
       <g clip-path="url(#${id('h')})"><g clip-path="url(#${id('z')})">${hair}</g></g>
       ${line(LT.SKULL, 2.6)}${line(LT.FACE, 2.6)}${line(LT.JAW, 2.4)}${line(LT.THROAT, 2.2)}${line(LT.EAR, 2.8)}${line(LT.BROW, 2.6)}
-      ${style.buzz ? '' : `<line class="cut-mark" x1="130" x2="396" y1="${top}" y2="${top}" style="stroke:var(--fg, #ede6da);stroke-width:3;stroke-dasharray:12 9" opacity=".85"/>`}
+      <line class="cut-mark" x1="130" x2="396" y1="${mark}" y2="${mark}" style="stroke:var(--fg, #ede6da);stroke-width:3;stroke-dasharray:12 9" opacity=".85"/>
       <g aria-hidden="true">
-        <g class="cut-clip" style="--b:${style.buzz ? 300 : bottom}px;--t:${style.buzz ? 170 : top}px">
+        <g class="cut-clip" style="--b:${style.buzz ? 300 : bottom}px;--t:${mark}px">
           <rect y="-12" width="52" height="24" rx="9" style="fill:var(--fg, #ede6da)"/>
           <rect x="-9" y="-14" width="12" height="28" rx="3.5" style="fill:var(--hair, #c8a46a)"/>
         </g>
